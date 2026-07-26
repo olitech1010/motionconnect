@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Motion Connect — Internet Access</title>
+<style>
+  /* =========================================================================
+     MOTION CONNECT — CAPTIVE PORTAL
+     Fully self-contained: no external fonts, scripts, or images.
+     This is required — the page loads BEFORE the user has internet access.
+     ========================================================================= */
+
+  :root {
+    --ink:        #0D1B2A;   /* primary text */
+    --ink-soft:   #3A4A5E;
+    --muted:      #667891;   /* labels, meta */
+    --brand-deep: #0C3358;   /* navy anchor */
+    --brand:      #1466B8;   /* signal blue */
+    --signal:     #05C46B;   /* connected green — pay / live / success */
+    --signal-ink: #04482A;
+    --bg:         #EDF1F6;
+    --surface:    #FFFFFF;
+    --hair:       #E1E8F0;
+    --hair-strong:#CBD6E2;
+    --danger:     #D64545;
+    --shadow:     0 1px 2px rgba(13,27,42,.06), 0 8px 24px rgba(13,27,42,.08);
+    --radius:     16px;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body { margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    padding: 16px;
+    min-height: 100vh;
+  }
+
+  .num { font-variant-numeric: tabular-nums; }
+
+  .wrap { max-width: 460px; margin: 0 auto; }
+
+  /* ---- Top bar ---- */
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    margin: 6px 2px 16px;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand-mark {
+    width: 40px; height: 40px; border-radius: 11px;
+    background: linear-gradient(135deg, var(--brand) 0%, var(--brand-deep) 100%);
+    display: flex; align-items: center; justify-content: center; flex: 0 0 auto;
+    box-shadow: 0 4px 10px rgba(12,51,88,.28);
+  }
+  .brand-mark svg { display: block; }
+  .brand-name { font-weight: 800; font-size: 15px; letter-spacing: -.2px; line-height: 1.1; }
+  .brand-name small { display: block; font-weight: 500; font-size: 11px; color: var(--muted); letter-spacing: .3px; }
+
+  .live {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11px; font-weight: 700; letter-spacing: .4px;
+    color: var(--signal-ink);
+    background: rgba(5,196,107,.12);
+    border: 1px solid rgba(5,196,107,.28);
+    padding: 5px 10px; border-radius: 999px;
+  }
+  .live .dot {
+    width: 7px; height: 7px; border-radius: 50%; background: var(--signal);
+    box-shadow: 0 0 0 0 rgba(5,196,107,.6);
+    animation: pulse 1.8s infinite;
+  }
+  @keyframes pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(5,196,107,.55); }
+    70%  { box-shadow: 0 0 0 7px rgba(5,196,107,0); }
+    100% { box-shadow: 0 0 0 0 rgba(5,196,107,0); }
+  }
+
+  /* ---- Rotating promos / adverts ---- */
+  .promo {
+    position: relative; overflow: hidden; min-height: 58px;
+    background: linear-gradient(135deg, var(--brand-deep) 0%, var(--brand) 100%);
+    border-radius: 14px; padding: 13px 15px; margin-bottom: 14px; box-shadow: var(--shadow);
+  }
+  .promo::after {
+    content: "OFFERS"; position: absolute; top: 9px; right: 12px;
+    font-size: 9px; font-weight: 800; letter-spacing: 1.2px; color: rgba(255,255,255,.55);
+  }
+  .promo-slide { display: none; }
+  .promo-slide.on { display: block; animation: promoFade .5s ease; }
+  .promo-slide .ph { color: #fff; font-size: 14px; font-weight: 800; letter-spacing: -.2px; padding-right: 46px; }
+  .promo-slide .ps { color: rgba(255,255,255,.85); font-size: 12px; margin-top: 2px; }
+  .promo-dots { display: flex; gap: 5px; margin-top: 10px; }
+  .promo-dots b { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,.35); display: block; transition: .2s; }
+  .promo-dots b.on { background: #fff; width: 16px; border-radius: 3px; }
+  @keyframes promoFade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+  /* ---- Tabs ---- */
+  .tabs {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 4px;
+    background: var(--surface); border: 1px solid var(--hair);
+    border-radius: 12px; padding: 4px; margin-bottom: 14px; box-shadow: var(--shadow);
+  }
+  .tab {
+    border: 0; background: transparent; cursor: pointer;
+    font: inherit; font-weight: 700; font-size: 14px; color: var(--muted);
+    padding: 10px; border-radius: 9px; transition: .15s;
+  }
+  .tab[aria-selected="true"] { background: var(--brand); color: #fff; }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* ---- Card ---- */
+  .card {
+    background: var(--surface); border: 1px solid var(--hair);
+    border-radius: var(--radius); box-shadow: var(--shadow);
+    padding: 18px; margin-bottom: 14px;
+  }
+
+  .eyebrow {
+    font-size: 11px; font-weight: 800; letter-spacing: 1.4px;
+    color: var(--muted); text-transform: uppercase; margin: 0 0 12px;
+  }
+
+  /* ---- Package list ---- */
+  .plan {
+    display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px;
+    width: 100%; text-align: left; cursor: pointer;
+    background: var(--surface); border: 1.5px solid var(--hair);
+    border-radius: 14px; padding: 13px 14px; margin-bottom: 10px;
+    font: inherit; color: inherit; transition: border-color .15s, box-shadow .15s, background .15s;
+  }
+  .plan:last-child { margin-bottom: 0; }
+  .plan:hover { border-color: var(--hair-strong); }
+  .plan[aria-pressed="true"] {
+    border-color: var(--signal);
+    background: rgba(5,196,107,.05);
+    box-shadow: 0 0 0 3px rgba(5,196,107,.14);
+  }
+
+  /* signal-bars = relative data volume (encodes real info) */
+  .bars { display: flex; align-items: flex-end; gap: 3px; height: 26px; }
+  .bars b {
+    width: 5px; border-radius: 2px; background: var(--hair-strong);
+    display: block; transition: background .15s;
+  }
+  .bars b:nth-child(1){ height: 8px; }
+  .bars b:nth-child(2){ height: 13px; }
+  .bars b:nth-child(3){ height: 18px; }
+  .bars b:nth-child(4){ height: 22px; }
+  .bars b:nth-child(5){ height: 26px; }
+  .plan[aria-pressed="true"] .bars b.on { background: var(--signal); }
+  .plan .bars b.on { background: var(--brand); }
+
+  .plan-body .name { font-weight: 700; font-size: 15px; }
+  .plan-body .meta { font-size: 12.5px; color: var(--muted); margin-top: 1px; }
+  .plan-price { text-align: right; white-space: nowrap; }
+  .plan-price .cur { font-size: 11px; font-weight: 700; color: var(--muted); }
+  .plan-price .amt { font-size: 18px; font-weight: 800; letter-spacing: -.3px; }
+
+  /* ---- Inputs ---- */
+  .field { margin-top: 14px; }
+  .field label {
+    display: block; font-size: 12px; font-weight: 700; color: var(--ink-soft);
+    margin-bottom: 6px; letter-spacing: .2px;
+  }
+  .field input {
+    width: 100%; font: inherit; font-size: 16px; color: var(--ink);
+    background: #F7F9FC; border: 1.5px solid var(--hair-strong);
+    border-radius: 11px; padding: 13px 14px; transition: .15s;
+  }
+  .field input:focus {
+    outline: none; border-color: var(--brand); background: #fff;
+    box-shadow: 0 0 0 3px rgba(20,102,184,.15);
+  }
+  .field .hint { font-size: 11.5px; color: var(--muted); margin-top: 6px; }
+
+  /* ---- Buttons ---- */
+  .btn {
+    width: 100%; font: inherit; font-weight: 800; font-size: 15px;
+    border: 0; border-radius: 12px; padding: 15px; cursor: pointer;
+    transition: transform .05s, filter .15s; margin-top: 16px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn:active { transform: translateY(1px); }
+  .btn-pay { background: var(--signal); color: #04331E; }
+  .btn-pay:hover { filter: brightness(1.03); }
+  .btn-login { background: var(--brand); color: #fff; }
+  .btn-ghost {
+    background: transparent; color: var(--brand);
+    border: 1.5px solid var(--hair-strong); margin-top: 10px;
+  }
+  .btn[disabled] { opacity: .55; cursor: not-allowed; }
+  .lock { font-size: 13px; }
+
+  /* ---- Error banner (MikroTik $(error)) ---- */
+  .error {
+    display: none; background: rgba(214,69,69,.08); border: 1px solid rgba(214,69,69,.3);
+    color: var(--danger); font-size: 13px; font-weight: 600;
+    padding: 11px 13px; border-radius: 11px; margin-top: 14px;
+  }
+  .error.show { display: block; }
+
+  /* ---- Processing overlay ---- */
+  .overlay {
+    display: none; position: fixed; inset: 0; z-index: 50;
+    background: rgba(13,27,42,.55); backdrop-filter: blur(3px);
+    align-items: center; justify-content: center; padding: 24px;
+  }
+  .overlay.show { display: flex; }
+  .overlay .box {
+    background: var(--surface); border-radius: 18px; padding: 30px 26px;
+    text-align: center; max-width: 340px; width: 100%; box-shadow: var(--shadow);
+  }
+  .spinner {
+    width: 44px; height: 44px; margin: 0 auto 16px; border-radius: 50%;
+    border: 4px solid var(--hair); border-top-color: var(--signal);
+    animation: spin .8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .overlay h3 { margin: 0 0 6px; font-size: 17px; }
+  .overlay p  { margin: 0; font-size: 13.5px; color: var(--muted); }
+
+  /* ---- Credentials screen ---- */
+  #creds .head {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 4px;
+  }
+  #creds .check {
+    width: 30px; height: 30px; border-radius: 50%; background: var(--signal);
+    color: #fff; display: flex; align-items: center; justify-content: center; font-size: 17px; flex: 0 0 auto;
+  }
+  #creds h2 { margin: 0; font-size: 18px; }
+  #creds .sub { font-size: 13px; color: var(--muted); margin: 2px 0 16px; }
+  .cred-row {
+    display: flex; justify-content: space-between; align-items: center; gap: 12px;
+    padding: 11px 0; border-bottom: 1px solid var(--hair);
+  }
+  .cred-row:last-of-type { border-bottom: 0; }
+  .cred-row .k { font-size: 12.5px; color: var(--muted); font-weight: 600; }
+  .cred-row .v { font-size: 14px; font-weight: 700; text-align: right; word-break: break-word; }
+  .cred-row .v.big { font-size: 16px; letter-spacing: .5px; color: var(--brand-deep); }
+  .countdown {
+    text-align: center; font-size: 12.5px; color: var(--muted); margin-top: 14px;
+  }
+  .countdown b { color: var(--ink); }
+
+  /* ---- Footer ---- */
+  .foot {
+    text-align: center; font-size: 12px; color: var(--muted); margin: 18px 2px 6px; line-height: 1.7;
+  }
+  .foot a { color: var(--brand); text-decoration: none; font-weight: 600; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .live .dot, .spinner { animation: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ============ TOP BAR ============ -->
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-mark" aria-label="Motion Connect logo">
+        <svg viewBox="0 0 28 28" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
+          <rect x="4"    y="16" width="3.4" height="8"  rx="1.4" fill="#fff" opacity=".55"/>
+          <rect x="9.3"  y="12" width="3.4" height="12" rx="1.4" fill="#fff" opacity=".8"/>
+          <rect x="14.6" y="7"  width="3.4" height="17" rx="1.4" fill="#fff"/>
+          <circle cx="21.6" cy="8.6" r="2.2" fill="#05C46B"/>
+        </svg>
+      </div>
+      <div class="brand-name">Motion Connect<small>Campus Student Wi-Fi</small></div>
+    </div>
+    <span class="live"><span class="dot"></span>SECURE PAYMENT · LIVE</span>
+  </div>
+
+  <!-- ============ ROTATING PROMOS / ADVERTS ============ -->
+  <div class="promo" aria-live="polite">
+    <div id="promoTrack"><!-- promo slides injected by JS --></div>
+    <div class="promo-dots" id="promoDots"></div>
+  </div>
+
+  <!-- ============ TABS ============ -->
+  <div class="tabs" role="tablist">
+    <button class="tab" id="tabBuy"   role="tab" aria-selected="true"  onclick="showTab('buy')">Buy internet</button>
+    <button class="tab" id="tabLogin" role="tab" aria-selected="false" onclick="showTab('login')">I have an account</button>
+  </div>
+
+  <!-- ============ PANEL: BUY ============ -->
+  <section class="panel active" id="panel-buy" role="tabpanel">
+    <div class="card">
+      <p class="eyebrow">Choose your plan</p>
+      <div id="planList"><!-- packages injected by JS --></div>
+
+      <div class="field">
+        <label for="momoPhone">Mobile Money number</label>
+        <input id="momoPhone" type="tel" inputmode="numeric" autocomplete="tel"
+               placeholder="e.g. 024 000 0000" maxlength="15">
+        <div class="hint">You'll receive a prompt on this number to approve payment.</div>
+      </div>
+
+      <button class="btn btn-pay" id="payBtn" onclick="startPayment()" disabled>
+        <span class="lock">🔒</span> Proceed to secure payment
+      </button>
+      <div class="error" id="buyError"></div>
+    </div>
+  </section>
+
+  <!-- ============ PANEL: EXISTING LOGIN (MikroTik) ============ -->
+  <section class="panel" id="panel-login" role="tabpanel">
+    <div class="card">
+      <p class="eyebrow">Existing client login</p>
+
+      <!-- MikroTik hotspot login form. Do not rename the username/password
+           fields or the action — RouterOS depends on them. -->
+      <form name="login" action="$(link-login-only)" method="post"
+            onsubmit="return prepareLogin()">
+        <input type="hidden" name="dst"   value="$(link-orig)">
+        <input type="hidden" name="popup" value="true">
+
+        <div class="field">
+          <label for="username">Username / Voucher</label>
+          <input id="username" name="username" type="text" autocomplete="username"
+                 placeholder="Enter your username" value="$(username)">
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input id="password" name="password" type="password" autocomplete="current-password"
+                 placeholder="Enter your password">
+        </div>
+
+        <button class="btn btn-login" type="submit">Connect to internet</button>
+      </form>
+
+      <!-- MikroTik injects a message here on failed login -->
+      <div class="error $(if error)show$(endif)" id="loginError">$(error)</div>
+    </div>
+  </section>
+
+  <!-- ============ CREDENTIALS RESULT ============ -->
+  <section class="panel" id="panel-creds" role="tabpanel">
+    <div class="card" id="creds">
+      <div class="head">
+        <div class="check">✓</div>
+        <h2>Payment successful</h2>
+      </div>
+      <p class="sub">Your internet credentials are ready. Save them somewhere safe.</p>
+
+      <div class="cred-row"><span class="k">Voucher code</span><span class="v big" id="cVoucher">—</span></div>
+      <div class="cred-row"><span class="k">Username</span><span class="v" id="cUser">—</span></div>
+      <div class="cred-row"><span class="k">Password</span><span class="v" id="cPass">—</span></div>
+      <div class="cred-row"><span class="k">Package</span><span class="v" id="cPkg">—</span></div>
+      <div class="cred-row"><span class="k">Profile</span><span class="v" id="cProfile">—</span></div>
+      <div class="cred-row"><span class="k">Expiry date</span><span class="v" id="cExpiry">—</span></div>
+      <div class="cred-row"><span class="k">SMS status</span><span class="v" id="cSms">—</span></div>
+
+      <button class="btn btn-login" onclick="loginNow()">Login now</button>
+      <p class="countdown">Auto switching to login in <b id="cdNum">60</b> seconds…</p>
+    </div>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <!-- SUPPORT NUMBER: replace 233508135559 in BOTH links below with your real number
+       (international format, no + or spaces). e.g. 233241234567 -->
+  <p class="foot">
+    Need help? <a href="tel:+233508135559">Call support</a>
+    · <a href="https://wa.me/233508135559">WhatsApp</a>
+    · <a href="#" onclick="showTab('buy');return false;">How to buy data</a><br>
+    © Motion Connect · Powered by secure Mobile Money · Starlink
+  </p>
+</div>
+
+<!-- ============ PROCESSING OVERLAY ============ -->
+<div class="overlay" id="overlay">
+  <div class="box">
+    <div class="spinner"></div>
+    <h3 id="ovTitle">Processing payment request…</h3>
+    <p id="ovMsg">Approve the prompt on your phone to continue.</p>
+  </div>
+</div>
+
+<script>
+/* ===========================================================================
+   PAYMENT CONFIG  —  >>> YOUR WEB DEVELOPER EDITS THIS SECTION FOR HUBTEL <<<
+   ---------------------------------------------------------------------------
+   The front-end below is complete. To go live, the developer only needs to:
+
+   1. Stand up a small backend (Hubtel keys must NEVER live in this file — it's
+      public to every user). The backend talks to Hubtel's Receive Money /
+      Mobile Money API and, on success, creates the MikroTik hotspot user and
+      returns the voucher credentials.
+
+   2. Point the two endpoints below at that backend.
+
+      initiateEndpoint  POST {packageId, amount, phone}
+                        -> returns { reference: "<txn-id>" }
+                        (backend calls Hubtel to send the MoMo prompt)
+
+      statusEndpoint    GET ?reference=<txn-id>
+                        -> returns one of:
+                           { status: "pending" }
+                           { status: "failed",  message: "..." }
+                           { status: "success", credentials: {
+                               voucher, username, password,
+                               profile, expiry, sms
+                           } }
+                        (backend reads the Hubtel callback result)
+
+   3. Set liveMode = true. While false, the page runs in DEMO mode so you can
+      preview the full flow without a backend.
+   =========================================================================== */
+  const PAYMENT_CONFIG = {
+    liveMode: false,                                  // <-- set true once endpoints are ready
+    initiateEndpoint: "/api/payments/initiate",       // <-- your backend URL
+    statusEndpoint:   "/api/payments/status",         // <-- your backend URL
+    pollIntervalMs: 4000,                             // how often to check status
+    pollTimeoutMs:  120000                            // give up after 2 minutes
+  };
+
+  /* ---- Packages (edit freely; "profile" must match your MikroTik profile names) ---- */
+  const PACKAGES = [
+    { id: "weekly",   name: "Weekly Access",  data: "5GB",  duration: "7 Days Access",  amount: 11.00, profile: "weekly",   bars: 1 },
+    { id: "boost24",  name: "24-Hour Boost",  data: "15GB", duration: "24 Hour Access", amount: 15.00, profile: "boost24",  bars: 3 },
+    { id: "biweekly", name: "Bi-Weekly",      data: "11GB", duration: "14 Days Access", amount: 22.00, profile: "biweekly", bars: 2 },
+    { id: "bwpro",    name: "Bi-Weekly Pro",  data: "22GB", duration: "14 Days Access", amount: 42.00, profile: "bwpro",    bars: 4 },
+    { id: "monthly",  name: "Monthly Premium",data: "30GB", duration: "30 Days Access", amount: 61.00, profile: "monthly",  bars: 5 }
+  ];
+/* ===========================================================================
+   END CONFIG — nothing below normally needs changing
+   =========================================================================== */
+
+  let selected = null;
+
+  /* ---- Render packages ---- */
+  (function renderPlans() {
+    const list = document.getElementById("planList");
+    list.innerHTML = PACKAGES.map(function (p) {
+      let bars = "";
+      for (let i = 1; i <= 5; i++) bars += "<b class='" + (i <= p.bars ? "on" : "") + "'></b>";
+      return (
+        "<button type='button' class='plan' data-id='" + p.id + "' aria-pressed='false' onclick='selectPlan(\"" + p.id + "\")'>" +
+          "<span class='bars'>" + bars + "</span>" +
+          "<span class='plan-body'>" +
+            "<span class='name'>" + p.name + "</span>" +
+            "<span class='meta'>" + p.data + " · " + p.duration + "</span>" +
+          "</span>" +
+          "<span class='plan-price'><span class='cur'>GHS </span><span class='amt num'>" + p.amount.toFixed(2) + "</span></span>" +
+        "</button>"
+      );
+    }).join("");
+  })();
+
+  function selectPlan(id) {
+    selected = PACKAGES.find(function (p) { return p.id === id; });
+    document.querySelectorAll(".plan").forEach(function (el) {
+      el.setAttribute("aria-pressed", el.dataset.id === id ? "true" : "false");
+    });
+    updatePayBtn();
+  }
+
+  function updatePayBtn() {
+    const phone = document.getElementById("momoPhone").value.replace(/\D/g, "");
+    document.getElementById("payBtn").disabled = !(selected && phone.length >= 9);
+  }
+  document.getElementById("momoPhone").addEventListener("input", updatePayBtn);
+
+  /* ---- Tabs ---- */
+  function showTab(which) {
+    const map = { buy: "panel-buy", login: "panel-login", creds: "panel-creds" };
+    Object.values(map).forEach(function (id) { document.getElementById(id).classList.remove("active"); });
+    document.getElementById(map[which]).classList.add("active");
+    if (which !== "creds") {
+      document.getElementById("tabBuy").setAttribute("aria-selected", which === "buy");
+      document.getElementById("tabLogin").setAttribute("aria-selected", which === "login");
+    }
+  }
+
+  function showError(msg) {
+    const e = document.getElementById("buyError");
+    e.textContent = msg; e.classList.add("show");
+  }
+
+  /* ---- Payment flow ---- */
+  function startPayment() {
+    document.getElementById("buyError").classList.remove("show");
+    const phone = document.getElementById("momoPhone").value.replace(/\D/g, "");
+    if (!selected) return showError("Please select a package.");
+    if (phone.length < 9) return showError("Enter a valid Mobile Money number.");
+
+    openOverlay("Sending payment prompt…", "Approve the prompt on " + phone + " to continue.");
+
+    if (!PAYMENT_CONFIG.liveMode) { return demoFlow(); }   // preview mode
+
+    // ---- LIVE: initiate charge via your backend ----
+    fetch(PAYMENT_CONFIG.initiateEndpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ packageId: selected.id, amount: selected.amount, phone: phone })
+    })
+    .then(function (r) { return r.json(); })
+    .then(function (data) {
+      if (!data.reference) throw new Error(data.message || "Could not start payment.");
+      pollStatus(data.reference, Date.now());
+    })
+    .catch(function (err) { closeOverlay(); showError(err.message || "Payment could not be started. Try again."); });
+  }
+
+  function pollStatus(reference, startedAt) {
+    if (Date.now() - startedAt > PAYMENT_CONFIG.pollTimeoutMs) {
+      closeOverlay(); showError("Payment timed out. If you were charged, contact support.");
+      return;
+    }
+    fetch(PAYMENT_CONFIG.statusEndpoint + "?reference=" + encodeURIComponent(reference))
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (data.status === "success") { showCredentials(data.credentials); }
+        else if (data.status === "failed") { closeOverlay(); showError(data.message || "Payment failed or was declined."); }
+        else { setTimeout(function () { pollStatus(reference, startedAt); }, PAYMENT_CONFIG.pollIntervalMs); }
+      })
+      .catch(function () { setTimeout(function () { pollStatus(reference, startedAt); }, PAYMENT_CONFIG.pollIntervalMs); });
+  }
+
+  /* ---- Demo flow (liveMode = false) ---- */
+  function demoFlow() {
+    setTimeout(function () {
+      const v = "MC-" + Math.random().toString(36).slice(2, 8).toUpperCase();
+      const exp = new Date(Date.now() + 7 * 864e5).toLocaleDateString();
+      showCredentials({
+        voucher: v, username: v.toLowerCase(), password: Math.random().toString(36).slice(2, 8),
+        profile: selected.profile, expiry: exp, sms: "Sent ✓ (demo)"
+      });
+    }, 2600);
+  }
+
+  /* ---- Credentials ---- */
+  function showCredentials(c) {
+    closeOverlay();
+    document.getElementById("cVoucher").textContent = c.voucher || "—";
+    document.getElementById("cUser").textContent    = c.username || "—";
+    document.getElementById("cPass").textContent    = c.password || "—";
+    document.getElementById("cPkg").textContent     = selected ? selected.name : "—";
+    document.getElementById("cProfile").textContent = c.profile  || "—";
+    document.getElementById("cExpiry").textContent  = c.expiry   || "—";
+    document.getElementById("cSms").textContent     = c.sms      || "—";
+
+    // Prefill the login form so "Login now" just works
+    document.getElementById("username").value = c.username || "";
+    document.getElementById("password").value = c.password || "";
+
+    showTab("creds");
+    startCountdown(60);
+  }
+
+  let cdTimer = null;
+  function startCountdown(n) {
+    clearInterval(cdTimer);
+    const el = document.getElementById("cdNum"); el.textContent = n;
+    cdTimer = setInterval(function () {
+      n--; el.textContent = n;
+      if (n <= 0) { clearInterval(cdTimer); loginNow(); }
+    }, 1000);
+  }
+
+  function loginNow() {
+    clearInterval(cdTimer);
+    showTab("login");
+    // Uncomment to auto-submit once credentials are prefilled:
+    // document.forms["login"].submit();
+  }
+
+  /* ---- Overlay helpers ---- */
+  function openOverlay(title, msg) {
+    document.getElementById("ovTitle").textContent = title;
+    document.getElementById("ovMsg").textContent = msg;
+    document.getElementById("overlay").classList.add("show");
+  }
+  function closeOverlay() { document.getElementById("overlay").classList.remove("show"); }
+
+  /* ---- MikroTik CHAP support ----
+     If your hotspot uses CHAP, RouterOS replaces $(chap-id). This hashes the
+     password client-side before submit. Harmless if CHAP is off. -->  */
+  function prepareLogin() {
+    return true; // RouterOS handles the POST; see note below to enable MD5/CHAP.
+  }
+
+  /* ===========================================================================
+     ROTATING PROMOS / ADVERTS  —  edit this list freely.
+     Each promo has an icon (emoji), a headline, and a sub line. Add or remove
+     as many as you like; they auto-rotate every 4.5 seconds.
+     =========================================================================== */
+  const PROMOS = [
+    { icon: "\u26A1", head: "Powered by Starlink",              sub: "Fast, reliable internet across campus." },
+    { icon: "\uD83C\uDF93", head: "Student favourite: Weekly Access", sub: "5GB for just GHS 11 \u2014 7 days." },
+    { icon: "\uD83D\uDCB0", head: "Best value: Monthly Premium",      sub: "30GB for GHS 61 \u2014 30 days." },
+    { icon: "\uD83D\uDCF1", head: "Pay with Mobile Money",            sub: "Quick and secure, right on this page." },
+    { icon: "\uD83D\uDCAC", head: "Need help?",                       sub: "Chat our support team on WhatsApp." }
+  ];
+  (function initPromos() {
+    const track = document.getElementById("promoTrack");
+    const dots  = document.getElementById("promoDots");
+    if (!track || !PROMOS.length) return;
+    track.innerHTML = PROMOS.map(function (p, i) {
+      return "<div class='promo-slide" + (i === 0 ? " on" : "") + "'>" +
+               "<div class='ph'>" + p.icon + " " + p.head + "</div>" +
+               "<div class='ps'>" + p.sub + "</div></div>";
+    }).join("");
+    dots.innerHTML = PROMOS.map(function (_, i) { return "<b class='" + (i === 0 ? "on" : "") + "'></b>"; }).join("");
+    const slides = track.querySelectorAll(".promo-slide");
+    const bs = dots.querySelectorAll("b");
+    if (slides.length < 2) return; // no need to rotate a single promo
+    let i = 0;
+    setInterval(function () {
+      slides[i].classList.remove("on"); bs[i].classList.remove("on");
+      i = (i + 1) % slides.length;
+      slides[i].classList.add("on"); bs[i].classList.add("on");
+    }, 4500);
+  })();
+</script>
+
+<!-- MikroTik CHAP block: RouterOS strips this out if CHAP is disabled.
+$(if chap-id)
+<script>
+  // Optional: enable client-side MD5 hashing here if your server requires CHAP.
+</script>
+$(endif)
+-->
+</body>
+</html>
