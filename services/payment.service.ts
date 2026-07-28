@@ -37,6 +37,9 @@ export class PaymentService {
     const url = 'https://payproxyapi.hubtel.com/items/initiate'
 
     try {
+      const domain = process.env.NEXT_PUBLIC_PORTAL_DOMAIN || 'localhost:3000'
+      const protocol = domain.includes('localhost') ? 'http' : 'https'
+
       const response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -47,7 +50,7 @@ export class PaymentService {
           totalAmount: amount,
           description,
           callbackUrl,
-          returnUrl: `${process.env.NEXT_PUBLIC_PORTAL_DOMAIN}/portal/status?ref=${reference}`,
+          returnUrl: `${protocol}://${domain}/portal/status?ref=${reference}`,
           merchantAccountNumber: merchantAccount,
           clientReference: reference,
         }),
