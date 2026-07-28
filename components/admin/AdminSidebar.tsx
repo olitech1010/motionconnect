@@ -2,8 +2,8 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
-import { LayoutDashboard, Wifi, Receipt, HardDrive, Activity, ShieldCheck, LogOut, ExternalLink, Users } from 'lucide-react'
+import { usePathname } from 'next/navigation'
+import { LayoutDashboard, Wifi, Receipt, HardDrive, Activity, ShieldCheck, ExternalLink, Users } from 'lucide-react'
 
 const NAV_ITEMS = [
   { label: 'Overview', href: '/admin', icon: LayoutDashboard },
@@ -16,16 +16,6 @@ const NAV_ITEMS = [
 
 export function AdminSidebar() {
   const pathname = usePathname()
-  const router = useRouter()
-
-  const handleLogout = async () => {
-    try {
-      await fetch('/api/auth/logout', { method: 'POST' })
-    } finally {
-      router.push('/login')
-      router.refresh()
-    }
-  }
 
   return (
     <aside className="w-64 bg-canvas text-ink flex flex-col justify-between shrink-0 border-r border-hairline font-sans">
