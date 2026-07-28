@@ -17,11 +17,11 @@ interface CaptivePortalProps {
 }
 
 const PROMOS = [
-  { icon: <Zap className="w-4 h-4 text-canvas" />, head: 'Powered by Starlink', sub: 'Fast, low-latency internet across campus.' },
-  { icon: <Award className="w-4 h-4 text-canvas" />, head: 'Student Favourite: Weekly Access', sub: '5GB for just GHS 11 — 7 full days.' },
-  { icon: <Zap className="w-4 h-4 text-canvas" />, head: 'Best Value: Monthly Premium', sub: '30GB for GHS 61 — 30 days.' },
-  { icon: <Smartphone className="w-4 h-4 text-canvas" />, head: 'Pay with Mobile Money', sub: 'Instant & secure approval on your phone.' },
-  { icon: <MessageCircle className="w-4 h-4 text-canvas" />, head: 'Need Help?', sub: 'Chat our support team on WhatsApp anytime.' },
+  { icon: <Zap className="w-4 h-4 text-kumo-brand" />, head: 'Powered by Starlink', sub: 'Fast, low-latency internet across campus.' },
+  { icon: <Award className="w-4 h-4 text-kumo-brand" />, head: 'Student Favourite: Weekly Access', sub: '5GB for just GHS 11 — 7 full days.' },
+  { icon: <Zap className="w-4 h-4 text-kumo-brand" />, head: 'Best Value: Monthly Premium', sub: '30GB for GHS 61 — 30 days.' },
+  { icon: <Smartphone className="w-4 h-4 text-kumo-brand" />, head: 'Pay with Mobile Money', sub: 'Instant & secure approval on your phone.' },
+  { icon: <MessageCircle className="w-4 h-4 text-kumo-brand" />, head: 'Need Help?', sub: 'Chat our support team on WhatsApp anytime.' },
 ]
 
 export function CaptivePortal({ initialPackages, mikrotikParams }: CaptivePortalProps) {
@@ -205,14 +205,14 @@ export function CaptivePortal({ initialPackages, mikrotikParams }: CaptivePortal
   const selectedPackage = initialPackages.find((p) => p.id === selectedPkgId)
 
   return (
-    <div className="min-h-screen bg-kumo-brand text-cream py-6 px-4 font-sans antialiased selection:bg-selection-bg selection:text-cream">
+    <div className="min-h-screen bg-canvas text-ink py-6 px-4 font-sans antialiased selection:bg-selection-bg selection:text-cream">
       <div className="max-w-[460px] mx-auto">
         
         {/* ============ CNA DETECTED WARNING ============ */}
         {isCna && (
-          <div className="mb-4 bg-canvas/10 border border-canvas/20 rounded-lg p-3.5 flex items-start gap-3 shadow-sm">
-            <ShieldAlert className="w-5 h-5 text-cream shrink-0 mt-0.5" />
-            <div className="text-xs text-cream leading-relaxed">
+          <div className="mb-4 bg-emergency-red/10 border border-emergency-red/20 rounded-lg p-3.5 flex items-start gap-3 shadow-sm">
+            <ShieldAlert className="w-5 h-5 text-emergency-red shrink-0 mt-0.5" />
+            <div className="text-xs text-emergency-red leading-relaxed">
               <span className="font-bold">Captive Portal Browser Detected:</span> Please copy or screenshot your login credentials when generated before closing this screen.
             </div>
           </div>
@@ -221,36 +221,36 @@ export function CaptivePortal({ initialPackages, mikrotikParams }: CaptivePortal
         {/* ============ TOP BAR ============ */}
         <header className="flex items-center justify-between mb-4 px-0.5">
           <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-full bg-cream flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-full bg-kumo-brand flex items-center justify-center shrink-0 shadow-sm">
               <svg viewBox="0 0 28 28" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
-                <rect x="4" y="16" width="3.4" height="8" rx="1.4" fill="#ff5e1f" opacity=".55" />
-                <rect x="9.3" y="12" width="3.4" height="12" rx="1.4" fill="#ff5e1f" opacity=".8" />
-                <rect x="14.6" y="7" width="3.4" height="17" rx="1.4" fill="#ff5e1f" />
+                <rect x="4" y="16" width="3.4" height="8" rx="1.4" fill="#fffbf5" opacity=".55" />
+                <rect x="9.3" y="12" width="3.4" height="12" rx="1.4" fill="#fffbf5" opacity=".8" />
+                <rect x="14.6" y="7" width="3.4" height="17" rx="1.4" fill="#fffbf5" />
                 <circle cx="21.6" cy="8.6" r="2.2" fill="#262626" />
               </svg>
             </div>
             <div>
-              <h1 className="font-medium text-[16px] tracking-tight leading-tight text-cream">Motion Connect</h1>
-              <p className="font-mono text-[12px] text-cream/80 tracking-wide">Campus Student Wi-Fi</p>
+              <h1 className="font-medium text-[16px] tracking-tight leading-tight text-ink">Motion Connect</h1>
+              <p className="font-mono text-[12px] text-muted tracking-wide">Campus Student Wi-Fi</p>
             </div>
           </div>
-          <div className="inline-flex items-center gap-1.5 font-mono text-[12px] font-bold tracking-wider text-ink bg-cream border border-cream/30 px-2.5 py-1 rounded-full">
+          <div className="inline-flex items-center gap-1.5 font-mono text-[12px] font-bold tracking-wider text-ai bg-ai/10 border border-ai/20 px-2.5 py-1 rounded-full">
             <span className="w-1.5 h-1.5 rounded-full bg-ai animate-pulse shadow-[0_0_8px_#00bd7d]" />
             LIVE
           </div>
         </header>
 
         {/* ============ ROTATING PROMO BANNER ============ */}
-        <div className="relative overflow-hidden bg-kumo-brand-dark rounded-lg p-3.5 mb-3.5 text-cream min-h-[64px] flex flex-col justify-between border border-white/10">
-          <span className="absolute top-2.5 right-3 text-[10px] font-mono tracking-widest text-cream/60 uppercase">
+        <div className="relative overflow-hidden bg-hairline/30 rounded-lg p-3.5 mb-3.5 text-ink min-h-[64px] flex flex-col justify-between border border-hairline shadow-sm">
+          <span className="absolute top-2.5 right-3 text-[10px] font-mono tracking-widest text-muted uppercase">
             OFFERS
           </span>
           <div className="transition-all duration-300 pr-12">
-            <div className="flex items-center gap-2 font-medium text-[14px] tracking-tight text-cream mb-0.5">
+            <div className="flex items-center gap-2 font-medium text-[14px] tracking-tight text-ink mb-0.5">
               {PROMOS[promoIdx].icon}
               <span>{PROMOS[promoIdx].head}</span>
             </div>
-            <p className="font-mono text-[12px] text-cream/80 leading-snug">{PROMOS[promoIdx].sub}</p>
+            <p className="font-mono text-[12px] text-ink-soft leading-snug">{PROMOS[promoIdx].sub}</p>
           </div>
           <div className="flex gap-1.5 mt-2.5">
             {PROMOS.map((_, idx) => (
@@ -258,7 +258,7 @@ export function CaptivePortal({ initialPackages, mikrotikParams }: CaptivePortal
                 key={idx}
                 onClick={() => setPromoIdx(idx)}
                 className={`h-1 rounded-full transition-all duration-300 ${
-                  idx === promoIdx ? 'w-4 bg-cream' : 'w-1 bg-cream/35 hover:bg-cream/60'
+                  idx === promoIdx ? 'w-4 bg-kumo-brand' : 'w-1 bg-kumo-brand/35 hover:bg-kumo-brand/60'
                 }`}
                 aria-label={`Promo slide ${idx + 1}`}
               />
@@ -267,14 +267,14 @@ export function CaptivePortal({ initialPackages, mikrotikParams }: CaptivePortal
         </div>
 
         {/* ============ TABS ============ */}
-        <div className="grid grid-cols-2 gap-1 bg-kumo-brand-dark rounded-lg p-1 mb-3.5 border border-white/10">
+        <div className="grid grid-cols-2 gap-1 bg-hairline/50 rounded-lg p-1 mb-3.5 border border-hairline">
           <button
             type="button"
             onClick={() => setActiveTab('buy')}
             className={`py-2 px-3 rounded-md font-mono font-medium text-xs transition-all ${
               activeTab === 'buy' || activeTab === 'creds'
                 ? 'bg-canvas text-ink shadow-sm'
-                : 'text-cream/80 hover:text-cream hover:bg-white/5'
+                : 'text-ink-soft hover:text-ink hover:bg-canvas/50'
             }`}
           >
             Buy internet
@@ -285,7 +285,7 @@ export function CaptivePortal({ initialPackages, mikrotikParams }: CaptivePortal
             className={`py-2 px-3 rounded-md font-mono font-medium text-xs transition-all ${
               activeTab === 'login'
                 ? 'bg-canvas text-ink shadow-sm'
-                : 'text-cream/80 hover:text-cream hover:bg-white/5'
+                : 'text-ink-soft hover:text-ink hover:bg-canvas/50'
             }`}
           >
             I have an account
@@ -531,26 +531,26 @@ export function CaptivePortal({ initialPackages, mikrotikParams }: CaptivePortal
         )}
 
         {/* ============ FOOTER ============ */}
-        <footer className="text-center font-mono text-[12px] text-cream/70 mt-5 mb-2 leading-relaxed space-y-1">
+        <footer className="text-center font-mono text-[12px] text-muted mt-5 mb-2 leading-relaxed space-y-1">
           <div>
             Need help?{' '}
-            <a href="tel:+233508135559" className="text-cream font-medium hover:underline">
+            <a href="tel:+233508135559" className="text-ink font-bold hover:underline">
               Call Support
             </a>{' '}
             ·{' '}
-            <a href="https://wa.me/233508135559" target="_blank" rel="noopener noreferrer" className="text-cream font-medium hover:underline">
+            <a href="https://wa.me/233508135559" target="_blank" rel="noopener noreferrer" className="text-ink font-bold hover:underline">
               WhatsApp
             </a>{' '}
             ·{' '}
             <button
               type="button"
               onClick={() => setActiveTab('buy')}
-              className="text-cream font-medium hover:underline bg-transparent border-0 cursor-pointer p-0 font-mono"
+              className="text-ink font-bold hover:underline bg-transparent border-0 cursor-pointer p-0 font-mono"
             >
               How to buy data
             </button>
           </div>
-          <div className="text-[11px] text-cream/50">
+          <div className="text-[11px] text-muted/70">
             © {new Date().getFullYear()} Motion Connect · Powered by Secure Mobile Money & Starlink
           </div>
         </footer>

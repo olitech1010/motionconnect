@@ -3,6 +3,7 @@ import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { AdminSidebar } from '@/components/admin/AdminSidebar'
+import { AdminHeader } from '@/components/admin/AdminHeader'
 
 export const metadata = {
   title: 'Admin Console | Motion Connect',
@@ -32,11 +33,14 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   }
 
   return (
-    <div className="flex h-screen bg-[#F4F7FB] font-sans antialiased overflow-hidden selection:bg-[#1466B8]/15">
+    <div className="flex h-screen bg-canvas font-sans antialiased overflow-hidden selection:bg-kumo-brand/15">
       <AdminSidebar />
-      <main className="flex-1 overflow-y-auto p-8">
-        <div className="max-w-7xl mx-auto">{children}</div>
-      </main>
+      <div className="flex-1 flex flex-col min-w-0">
+        <AdminHeader />
+        <main className="flex-1 overflow-y-auto p-8 bg-hairline/20">
+          <div className="max-w-7xl mx-auto">{children}</div>
+        </main>
+      </div>
     </div>
   )
 }

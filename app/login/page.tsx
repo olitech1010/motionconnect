@@ -6,8 +6,8 @@ import { ShieldCheck, Mail, Lock, ArrowRight, Loader2, AlertCircle } from 'lucid
 
 export default function LoginPage() {
   const router = useRouter()
-  const [email, setEmail] = useState('admin@motionconect.com')
-  const [password, setPassword] = useState('00000000')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -38,24 +38,24 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0A1520] flex items-center justify-center p-4 font-sans antialiased selection:bg-[#05C46B]/20">
-      <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden border border-zinc-200">
+    <div className="min-h-screen bg-canvas flex items-center justify-center p-4 font-sans antialiased selection:bg-kumo-brand/20">
+      <div className="w-full max-w-md bg-canvas rounded-lg overflow-hidden border border-hairline shadow-sm">
         {/* Header */}
-        <div className="bg-gradient-to-br from-[#0D1B2A] via-[#1466B8] to-[#0C3358] p-8 text-white text-center relative">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#1466B8] to-[#05C46B] text-white flex items-center justify-center font-black text-2xl mx-auto mb-4 shadow-lg shadow-[#05C46B]/25">
+        <div className="bg-ink p-8 text-cream text-center relative border-b border-hairline">
+          <div className="w-14 h-14 rounded-md bg-kumo-brand text-cream flex items-center justify-center font-bold text-2xl mx-auto mb-4 shadow-sm">
             MC
           </div>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-[11px] font-extrabold uppercase tracking-widest mb-2">
-            <ShieldCheck className="w-3.5 h-3.5 text-[#05C46B]" />
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-cream/10 border border-cream/20 font-mono text-[11px] font-bold uppercase tracking-widest mb-2">
+            <ShieldCheck className="w-3.5 h-3.5 text-ai" />
             <span>Authorized Personnel Only</span>
           </div>
-          <h1 className="text-2xl font-black tracking-tight">Admin Console Login</h1>
-          <p className="text-xs text-white/70 mt-1">Manage Wi-Fi plans, MikroTik RB5009, & transactions</p>
+          <h1 className="text-2xl font-medium tracking-tight">Admin Console Login</h1>
+          <p className="font-mono text-[12px] text-cream/70 mt-1">Manage Wi-Fi plans, MikroTik RB5009, & transactions</p>
         </div>
 
         <form onSubmit={handleLogin} className="p-8 space-y-6">
           {error && (
-            <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold flex items-center gap-2 animate-in fade-in">
+            <div className="p-4 rounded-md bg-emergency-red/10 border border-emergency-red/20 text-emergency-red font-mono text-[11px] font-bold flex items-center gap-2 animate-in fade-in">
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{error}</span>
             </div>
@@ -63,29 +63,29 @@ export default function LoginPage() {
 
           <div className="space-y-4">
             <div>
-              <label htmlFor="admin-email" className="block text-xs font-extrabold uppercase tracking-wider text-zinc-600 mb-1.5">
+              <label htmlFor="admin-email" className="block font-mono text-[11px] font-bold uppercase tracking-wider text-muted mb-1.5">
                 Admin Email Address
               </label>
               <div className="relative">
-                <Mail className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <Mail className="w-4 h-4 text-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   id="admin-email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@motionconect.com"
+                  placeholder="admin@motionconnect.com"
                   required
-                  className="w-full pl-10 pr-4 py-3 bg-zinc-50 border border-zinc-300 rounded-xl font-semibold text-sm text-[#0D1B2A] focus:outline-none focus:border-[#1466B8] focus:bg-white transition-all"
+                  className="w-full pl-10 pr-4 py-3 bg-canvas border border-hairline rounded-md font-mono text-sm text-ink focus:outline-none focus:border-kumo-brand transition-all"
                 />
               </div>
             </div>
 
             <div>
-              <label htmlFor="admin-pass" className="block text-xs font-extrabold uppercase tracking-wider text-zinc-600 mb-1.5">
+              <label htmlFor="admin-pass" className="block font-mono text-[11px] font-bold uppercase tracking-wider text-muted mb-1.5">
                 Password
               </label>
               <div className="relative">
-                <Lock className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <Lock className="w-4 h-4 text-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   id="admin-pass"
                   type="password"
@@ -93,26 +93,16 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   required
-                  className="w-full pl-10 pr-4 py-3 bg-zinc-50 border border-zinc-300 rounded-xl font-semibold text-sm text-[#0D1B2A] focus:outline-none focus:border-[#1466B8] focus:bg-white transition-all"
+                  className="w-full pl-10 pr-4 py-3 bg-canvas border border-hairline rounded-md font-mono text-sm text-ink focus:outline-none focus:border-kumo-brand transition-all"
                 />
               </div>
-            </div>
-          </div>
-
-          <div className="bg-blue-50 border border-blue-200 p-3.5 rounded-xl text-xs text-blue-800 space-y-1">
-            <div className="font-extrabold flex items-center gap-1.5">
-              <span>📌 Seeding / Default Credentials:</span>
-            </div>
-            <div className="font-mono text-[11px] text-blue-700">
-              Email: <strong>admin@motionconect.com</strong><br />
-              Password: <strong>00000000</strong>
             </div>
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-[#1466B8] to-[#0D1B2A] text-white font-extrabold text-sm shadow-lg shadow-[#1466B8]/25 hover:brightness-110 active:scale-[0.99] transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+            className="w-full py-3.5 px-6 rounded-md bg-kumo-brand text-cream font-bold text-sm hover:bg-kumo-brand-dark active:scale-[0.99] transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer shadow-sm"
           >
             {loading ? (
               <>

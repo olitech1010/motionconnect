@@ -88,23 +88,6 @@ export function AdminSidebar() {
         </nav>
       </div>
 
-      {/* Footer Profile & Logout */}
-      <div className="p-4 border-t border-hairline bg-canvas">
-        <div className="flex items-center justify-between">
-          <div className="min-w-0">
-            <div className="text-xs font-medium text-ink truncate">admin@motionconect.com</div>
-            <div className="font-mono text-[10px] text-muted truncate uppercase mt-0.5 tracking-wider">Super Admin</div>
-          </div>
-          <button
-            type="button"
-            onClick={handleLogout}
-            title="Sign out"
-            className="p-2 rounded-full text-muted hover:text-emergency-red hover:bg-emergency-red/10 transition-colors cursor-pointer"
-          >
-            <LogOut className="w-4 h-4" />
-          </button>
-        </div>
-      </div>
     </aside>
   )
 }
