@@ -17,6 +17,18 @@ export interface HotspotUserProfile {
   'shared-users'?: number | string
 }
 
+export interface HotspotActiveSession {
+  '.id'?: string
+  server?: string
+  user: string
+  address: string
+  'mac-address': string
+  login?: string
+  uptime?: string
+  'bytes-in'?: number | string
+  'bytes-out'?: number | string
+}
+
 export interface MikroTikResponse<T = unknown> {
   success: boolean
   data?: T
