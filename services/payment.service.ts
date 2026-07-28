@@ -24,9 +24,9 @@ export class PaymentService {
       }
     }
 
-    const clientId = process.env.HUBTEL_CLIENT_ID
-    const clientSecret = process.env.HUBTEL_CLIENT_SECRET
-    const merchantAccount = process.env.HUBTEL_MERCHANT_ACCOUNT
+    const clientId = process.env.HUBTEL_CLIENT_ID?.trim()
+    const clientSecret = process.env.HUBTEL_CLIENT_SECRET?.trim()
+    const merchantAccount = process.env.HUBTEL_MERCHANT_ACCOUNT?.trim()
     const callbackUrl = process.env.HUBTEL_CALLBACK_URL
 
     if (!clientId || !clientSecret || !merchantAccount) {
