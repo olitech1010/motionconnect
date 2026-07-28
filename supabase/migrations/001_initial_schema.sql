@@ -2,7 +2,7 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Packages table
-CREATE TABLE public.packages (
+CREATE TABLE IF NOT EXISTS public.packages (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   name TEXT NOT NULL,
   slug TEXT UNIQUE NOT NULL,
@@ -20,7 +20,7 @@ CREATE TABLE public.packages (
 );
 
 -- Transactions table
-CREATE TABLE public.transactions (
+CREATE TABLE IF NOT EXISTS public.transactions (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   reference TEXT UNIQUE NOT NULL,
   hubtel_reference TEXT,
@@ -42,7 +42,7 @@ CREATE TABLE public.transactions (
 );
 
 -- Routers table
-CREATE TABLE public.routers (
+CREATE TABLE IF NOT EXISTS public.routers (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   name TEXT NOT NULL,
   campus TEXT NOT NULL,
@@ -58,14 +58,14 @@ CREATE TABLE public.routers (
 );
 
 -- Settings table
-CREATE TABLE public.settings (
+CREATE TABLE IF NOT EXISTS public.settings (
   key TEXT PRIMARY KEY,
   value TEXT NOT NULL,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- Activity Logs table
-CREATE TABLE public.activity_logs (
+CREATE TABLE IF NOT EXISTS public.activity_logs (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   action TEXT NOT NULL,
   actor TEXT NOT NULL DEFAULT 'system',
@@ -81,21 +81,28 @@ ALTER TABLE public.settings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.activity_logs ENABLE ROW LEVEL SECURITY;
 
 -- Allow public read access to active packages for captive portal
+DROP POLICY IF EXISTS "Public can view active packages" ON public.packages;
 CREATE POLICY "Public can view active packages" ON public.packages
   FOR SELECT USING (is_active = true);
 
 -- Allow public read access to transactions by reference (for status polling)
+DROP POLICY IF EXISTS "Public can view transaction status by reference" ON public.transactions;
 CREATE POLICY "Public can view transaction status by reference" ON public.transactions
   FOR SELECT USING (true);
 
 -- Authenticated admin users have full access to all tables
+DROP POLICY IF EXISTS "Admins have full access to packages" ON public.packages;
 CREATE POLICY "Admins have full access to packages" ON public.packages
   FOR ALL TO authenticated USING (true);
+DROP POLICY IF EXISTS "Admins have full access to transactions" ON public.transactions;
 CREATE POLICY "Admins have full access to transactions" ON public.transactions
   FOR ALL TO authenticated USING (true);
+DROP POLICY IF EXISTS "Admins have full access to routers" ON public.routers;
 CREATE POLICY "Admins have full access to routers" ON public.routers
   FOR ALL TO authenticated USING (true);
+DROP POLICY IF EXISTS "Admins have full access to settings" ON public.settings;
 CREATE POLICY "Admins have full access to settings" ON public.settings
   FOR ALL TO authenticated USING (true);
+DROP POLICY IF EXISTS "Admins have full access to activity logs" ON public.activity_logs;
 CREATE POLICY "Admins have full access to activity logs" ON public.activity_logs
   FOR ALL TO authenticated USING (true);

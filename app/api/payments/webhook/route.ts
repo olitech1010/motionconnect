@@ -41,6 +41,8 @@ export async function POST(request: Request) {
     if (status === 'success') {
       const pkg = transaction.package_id ? await PackageService.getPackageById(transaction.package_id) : null
       const profile = pkg?.mikrotik_profile || 'weekly'
+      const durationSec = pkg?.duration_seconds || 86400
+      const expiresAt = new Date(Date.now() + durationSec * 1000).toISOString()
 
       const voucher = `MC-${Math.random().toString(36).substring(2, 8).toUpperCase()}`
       const username = voucher.toLowerCase()
@@ -61,6 +63,7 @@ export async function POST(request: Request) {
         mikrotik_username: username,
         mikrotik_synced: true,
         sms_status: 'sent',
+        expires_at: expiresAt,
       })
 
       // Log in activity logs

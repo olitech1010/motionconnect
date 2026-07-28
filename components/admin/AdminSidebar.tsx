@@ -2,11 +2,12 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Wifi, Receipt, HardDrive, Activity, ShieldCheck, LogOut, ExternalLink } from 'lucide-react'
+import { usePathname, useRouter } from 'next/navigation'
+import { LayoutDashboard, Wifi, Receipt, HardDrive, Activity, ShieldCheck, LogOut, ExternalLink, Users } from 'lucide-react'
 
 const NAV_ITEMS = [
   { label: 'Overview', href: '/admin', icon: LayoutDashboard },
+  { label: 'Subscribers & Users', href: '/admin/users', icon: Users },
   { label: 'Packages', href: '/admin/packages', icon: Wifi },
   { label: 'Transactions', href: '/admin/transactions', icon: Receipt },
   { label: 'Router & Hotspot', href: '/admin/routers', icon: HardDrive },
@@ -15,6 +16,16 @@ const NAV_ITEMS = [
 
 export function AdminSidebar() {
   const pathname = usePathname()
+  const router = useRouter()
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' })
+    } finally {
+      router.push('/login')
+      router.refresh()
+    }
+  }
 
   return (
     <aside className="w-64 bg-[#0D1B2A] text-white flex flex-col justify-between shrink-0 border-r border-[#1B2D42]">
@@ -86,6 +97,7 @@ export function AdminSidebar() {
           </div>
           <button
             type="button"
+            onClick={handleLogout}
             title="Sign out"
             className="p-2 rounded-lg text-zinc-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors cursor-pointer"
           >

@@ -39,6 +39,8 @@ export default async function HomePage({ searchParams }: PageProps) {
     dst: getParamStr(resolvedParams['link-orig']) || getParamStr(resolvedParams['dst']),
     error: getParamStr(resolvedParams['error']),
     username: getParamStr(resolvedParams['username']),
+    mac: getParamStr(resolvedParams['mac']) || getParamStr(resolvedParams['client_mac']),
+    ip: getParamStr(resolvedParams['ip']) || getParamStr(resolvedParams['client_ip']),
   }
 
   return <CaptivePortal initialPackages={packages} mikrotikParams={mikrotikParams} />

@@ -1,19 +1,11 @@
 import React from 'react'
-import { createAdminClient } from '@/lib/supabase/admin'
+import { TransactionService } from '@/services/transaction.service'
 import { DollarSign, Users, Wifi, CheckCircle2, Clock, AlertCircle, ArrowUpRight } from 'lucide-react'
 
 export const revalidate = 0
 
 export default async function AdminDashboardPage() {
-  const supabase = createAdminClient()
-
-  // Fetch summary metrics
-  const { data: txns } = await supabase
-    .from('transactions')
-    .select('*')
-    .order('created_at', { ascending: false })
-
-  const allTxns = txns || []
+  const allTxns = await TransactionService.getAllTransactions()
   const successTxns = allTxns.filter((t) => t.status === 'success')
   const pendingTxns = allTxns.filter((t) => t.status === 'pending')
 
@@ -111,17 +103,18 @@ export default async function AdminDashboardPage() {
               <tr className="bg-zinc-50 border-b border-zinc-200 text-[11px] font-extrabold uppercase tracking-wider text-zinc-500">
                 <th className="py-3 px-6">Reference</th>
                 <th className="py-3 px-6">Phone Number</th>
+                <th className="py-3 px-6">Device Info</th>
                 <th className="py-3 px-6">Package Plan</th>
                 <th className="py-3 px-6">Amount</th>
                 <th className="py-3 px-6">Voucher Code</th>
                 <th className="py-3 px-6">Status</th>
-                <th className="py-3 px-6">Timestamp</th>
+                <th className="py-3 px-6">Expiry</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-100 text-sm font-medium text-[#0D1B2A]">
               {allTxns.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-12 text-center text-zinc-400">
+                  <td colSpan={8} className="py-12 text-center text-zinc-400">
                     No transactions recorded yet. Go to Captive Portal to test a payment!
                   </td>
                 </tr>
@@ -136,6 +129,14 @@ export default async function AdminDashboardPage() {
                         {txn.reference}
                       </td>
                       <td className="py-3.5 px-6 font-bold">{txn.phone}</td>
+                      <td className="py-3.5 px-6">
+                        <div className="text-xs font-bold text-zinc-800 truncate max-w-[150px]" title={txn.device_info || 'Unknown Device'}>
+                          {txn.device_info || 'Unknown Device'}
+                        </div>
+                        <div className="text-[10px] text-zinc-400 font-mono">
+                          MAC: {txn.mac_address || 'N/A'}
+                        </div>
+                      </td>
                       <td className="py-3.5 px-6 text-zinc-600">{txn.package_name}</td>
                       <td className="py-3.5 px-6 font-extrabold">GHS {txn.amount.toFixed(2)}</td>
                       <td className="py-3.5 px-6 font-mono text-xs">
@@ -167,8 +168,8 @@ export default async function AdminDashboardPage() {
                           <span className="capitalize">{txn.status}</span>
                         </span>
                       </td>
-                      <td className="py-3.5 px-6 text-xs text-zinc-400">
-                        {new Date(txn.created_at).toLocaleString()}
+                      <td className="py-3.5 px-6 text-xs text-zinc-500">
+                        {txn.expires_at ? new Date(txn.expires_at).toLocaleDateString() : '—'}
                       </td>
                     </tr>
                   )

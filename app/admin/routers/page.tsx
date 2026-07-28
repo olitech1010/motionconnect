@@ -1,14 +1,11 @@
 import React from 'react'
-import { createAdminClient } from '@/lib/supabase/admin'
+import { RouterService } from '@/services/router.service'
 import { HardDrive, CheckCircle2, Shield, Radio, Server, Cpu, Activity } from 'lucide-react'
 
 export const revalidate = 0
 
 export default async function AdminRoutersPage() {
-  const supabase = createAdminClient()
-  const { data: routers } = await supabase.from('routers').select('*')
-
-  const routerList = routers || []
+  const routerList = await RouterService.getAllRouters()
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">

@@ -11,6 +11,8 @@ interface CaptivePortalProps {
     dst?: string
     error?: string
     username?: string
+    mac?: string
+    ip?: string
   }
 }
 
@@ -44,8 +46,9 @@ export function CaptivePortal({ initialPackages, mikrotikParams }: CaptivePortal
     expiry: string
     sms: string
   } | null>(null)
-  const [countdown, setCountdown] = useState(60)
   const [copied, setCopied] = useState(false)
+  const [countdown, setCountdown] = useState(0)
+  const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null)
 
   // Promo Slider State
   const [promoIdx, setPromoIdx] = useState(0)
@@ -122,6 +125,22 @@ export function CaptivePortal({ initialPackages, mikrotikParams }: CaptivePortal
     setTimeout(() => checkStatus(), 3000)
   }, [])
 
+  // Check URL params for returning from checkout
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const params = new URLSearchParams(window.location.search)
+    const ref = params.get('ref')
+    const status = params.get('status')
+    if (ref && status === 'success') {
+      setTimeout(() => {
+        setIsProcessing(true)
+        setOvTitle('Connecting to Wi-Fi…')
+        setOvMsg('Verifying your payment credentials...')
+        startPolling(ref, Date.now())
+      }, 0)
+    }
+  }, [startPolling])
+
   const handleStartPayment = async () => {
     setErrorMsg(null)
     const cleanPhone = phone.replace(/\D/g, '')
@@ -150,6 +169,8 @@ export function CaptivePortal({ initialPackages, mikrotikParams }: CaptivePortal
           packageId: selectedPkg.id,
           amount: selectedPkg.amount,
           phone: cleanPhone,
+          macAddress: mikrotikParams?.mac,
+          ipAddress: mikrotikParams?.ip,
         }),
       })
 
@@ -160,6 +181,9 @@ export function CaptivePortal({ initialPackages, mikrotikParams }: CaptivePortal
         return
       }
 
+      if (data.checkoutUrl) {
+        setCheckoutUrl(data.checkoutUrl)
+      }
       setOvTitle('Waiting for MoMo approval…')
       setOvMsg(`Prompt sent to ${cleanPhone}. Please enter your PIN to authorize payment.`)
       startPolling(data.reference, Date.now())
@@ -540,7 +564,15 @@ export function CaptivePortal({ initialPackages, mikrotikParams }: CaptivePortal
           <div className="bg-white rounded-2xl p-7 max-w-[340px] w-full text-center shadow-xl border border-[#E1E8F0] animate-in fade-in zoom-in-95 duration-200">
             <div className="w-12 h-12 mx-auto mb-4 rounded-full border-4 border-[#E1E8F0] border-t-[#05C46B] animate-spin" />
             <h3 className="font-extrabold text-lg text-[#0D1B2A] mb-1.5">{ovTitle}</h3>
-            <p className="text-sm text-[#667891] leading-relaxed">{ovMsg}</p>
+            <p className="text-sm text-[#667891] leading-relaxed mb-4">{ovMsg}</p>
+            {checkoutUrl && (
+              <a
+                href={checkoutUrl}
+                className="inline-flex items-center justify-center gap-1.5 w-full py-3 px-4 rounded-xl bg-[#1466B8] text-white font-extrabold text-xs shadow-md hover:brightness-110 transition-all cursor-pointer mt-2"
+              >
+                <span>🔗 Open MoMo Checkout Simulator</span>
+              </a>
+            )}
           </div>
         </div>
       )}

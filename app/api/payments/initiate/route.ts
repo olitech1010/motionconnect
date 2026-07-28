@@ -8,6 +8,8 @@ const InitiateSchema = z.object({
   packageId: z.string().min(1, 'Package ID is required'),
   amount: z.number().positive('Amount must be positive'),
   phone: z.string().min(9, 'Phone number must be at least 9 digits'),
+  macAddress: z.string().optional(),
+  ipAddress: z.string().optional(),
 })
 
 export async function POST(request: Request) {
@@ -22,8 +24,11 @@ export async function POST(request: Request) {
       )
     }
 
-    const { packageId, phone } = validation.data
+    const { packageId, phone, macAddress, ipAddress } = validation.data
     const cleanPhone = phone.replace(/\D/g, '')
+    const userAgent = request.headers.get('user-agent') || 'Unknown Device'
+    const forwardedIp = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || ipAddress || 'Unknown IP'
+    const mac = macAddress || '00:00:00:00:00:00'
 
     // Fetch package from database
     const pkg = await PackageService.getPackageById(packageId)
@@ -44,13 +49,16 @@ export async function POST(request: Request) {
       amount: pkg.amount,
       package_id: pkg.id,
       package_name: pkg.name,
-      mac_address: '00:00:00:00:00:00',
+      mac_address: mac,
+      ip_address: forwardedIp,
+      device_info: userAgent,
+      data_used_bytes: 0,
       status: 'pending',
     })
 
     // Initiate payment with Hubtel (or demo mock mode)
     const paymentResult = await PaymentService.initiatePayment(
-      { packageId: pkg.id, phone: cleanPhone, macAddress: '00:00:00:00:00:00' },
+      { packageId: pkg.id, phone: cleanPhone, macAddress: mac },
       pkg.amount,
       reference,
       `Motion Connect Wi-Fi: ${pkg.name}`

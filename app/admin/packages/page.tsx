@@ -1,14 +1,11 @@
 import React from 'react'
-import { createAdminClient } from '@/lib/supabase/admin'
+import { PackageService } from '@/services/package.service'
 import { Signal, CheckCircle2, XCircle } from 'lucide-react'
 
 export const revalidate = 0
 
 export default async function AdminPackagesPage() {
-  const supabase = createAdminClient()
-  const { data: pkgs } = await supabase.from('packages').select('*').order('sort_order', { ascending: true })
-
-  const packages = pkgs || []
+  const packages = await PackageService.getAllPackages()
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">

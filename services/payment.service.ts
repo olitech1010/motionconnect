@@ -10,7 +10,7 @@ export class PaymentService {
     reference: string,
     description: string
   ): Promise<HubtelInitiateResponse> {
-    const isMock = process.env.MIKROTIK_MOCK === 'true' || process.env.HUBTEL_CLIENT_ID === 'demo_client_id'
+    const isMock = process.env.HUBTEL_MOCK === 'true' || process.env.HUBTEL_CLIENT_ID === 'demo_client_id' || process.env.HUBTEL_MERCHANT_ACCOUNT === 'demo_merchant_account'
 
     if (isMock) {
       console.log('--- [DEMO MODE] Initiating Hubtel Payment ---', { request, amount, reference })
