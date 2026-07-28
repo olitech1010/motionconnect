@@ -30,45 +30,45 @@ export default async function AdminLogsPage() {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-zinc-200 shadow-sm">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-canvas p-6 rounded-lg border border-hairline shadow-sm">
         <div>
-          <h1 className="text-2xl font-black text-[#0D1B2A] tracking-tight">System & Security Logs</h1>
-          <p className="text-sm text-zinc-500 mt-1">
+          <h1 className="text-2xl font-medium text-ink tracking-tight">System & Security Logs</h1>
+          <p className="font-mono text-[12px] text-muted mt-1">
             Audit trail of API requests, webhooks, voucher creation, and admin logins.
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <span className="px-3 py-1.5 rounded-xl bg-purple-50 text-purple-700 font-bold text-xs flex items-center gap-1.5">
+          <span className="px-3 py-1.5 rounded-md bg-sase/10 text-sase font-bold font-mono text-[11px] flex items-center gap-1.5">
             <ShieldCheck className="w-4 h-4" />
             <span>SAIF Audit Active</span>
           </span>
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-zinc-200 shadow-sm overflow-hidden">
-        <div className="divide-y divide-zinc-100">
+      <div className="bg-canvas rounded-lg border border-hairline shadow-sm overflow-hidden">
+        <div className="divide-y divide-hairline">
           {activityLogs.length === 0 ? (
-            <div className="p-12 text-center text-zinc-400 font-medium">
+            <div className="p-12 text-center text-muted font-mono text-[12px]">
               No activity logs recorded yet. Events will appear here automatically.
             </div>
           ) : (
             activityLogs.map((log) => (
-              <div key={log.id} className="p-4 sm:p-5 flex items-start gap-4 hover:bg-zinc-50/80 transition-colors">
-                <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#1466B8] flex items-center justify-center shrink-0 mt-0.5">
+              <div key={log.id} className="p-4 sm:p-5 flex items-start gap-4 hover:bg-hairline/30 transition-colors">
+                <div className="w-10 h-10 rounded-md bg-compute/10 text-compute flex items-center justify-center shrink-0 mt-0.5">
                   <Terminal className="w-5 h-5" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="font-extrabold text-sm text-[#0D1B2A]">{log.action}</span>
-                    <span className="text-xs font-mono text-zinc-400 shrink-0">
+                    <span className="font-bold text-sm text-ink">{log.action}</span>
+                    <span className="font-mono text-[11px] text-muted shrink-0">
                       {new Date(log.created_at).toLocaleString()}
                     </span>
                   </div>
-                  <p className="text-xs font-semibold text-zinc-500 mt-0.5">
-                    Actor: <span className="text-[#1466B8] font-bold">{log.actor || 'System'}</span>
+                  <p className="font-mono text-[11px] text-ink-soft mt-0.5 font-bold">
+                    Actor: <span className="text-kumo-brand">{log.actor || 'System'}</span>
                   </p>
                   {log.details && (
-                    <pre className="mt-2 text-[11px] font-mono bg-zinc-50 p-2.5 rounded-lg border border-zinc-200 text-zinc-700 overflow-x-auto">
+                    <pre className="mt-2 font-mono text-[11px] bg-hairline/30 p-2.5 rounded-md border border-hairline text-muted overflow-x-auto">
                       {JSON.stringify(log.details, null, 2)}
                     </pre>
                   )}

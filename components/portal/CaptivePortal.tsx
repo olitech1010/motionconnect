@@ -17,11 +17,11 @@ interface CaptivePortalProps {
 }
 
 const PROMOS = [
-  { icon: <Zap className="w-4 h-4 text-amber-400" />, head: 'Powered by Starlink', sub: 'Fast, low-latency internet across campus.' },
-  { icon: <Award className="w-4 h-4 text-emerald-400" />, head: 'Student Favourite: Weekly Access', sub: '5GB for just GHS 11 — 7 full days.' },
-  { icon: <Zap className="w-4 h-4 text-blue-400" />, head: 'Best Value: Monthly Premium', sub: '30GB for GHS 61 — 30 days.' },
-  { icon: <Smartphone className="w-4 h-4 text-purple-400" />, head: 'Pay with Mobile Money', sub: 'Instant & secure approval on your phone.' },
-  { icon: <MessageCircle className="w-4 h-4 text-emerald-300" />, head: 'Need Help?', sub: 'Chat our support team on WhatsApp anytime.' },
+  { icon: <Zap className="w-4 h-4 text-canvas" />, head: 'Powered by Starlink', sub: 'Fast, low-latency internet across campus.' },
+  { icon: <Award className="w-4 h-4 text-canvas" />, head: 'Student Favourite: Weekly Access', sub: '5GB for just GHS 11 — 7 full days.' },
+  { icon: <Zap className="w-4 h-4 text-canvas" />, head: 'Best Value: Monthly Premium', sub: '30GB for GHS 61 — 30 days.' },
+  { icon: <Smartphone className="w-4 h-4 text-canvas" />, head: 'Pay with Mobile Money', sub: 'Instant & secure approval on your phone.' },
+  { icon: <MessageCircle className="w-4 h-4 text-canvas" />, head: 'Need Help?', sub: 'Chat our support team on WhatsApp anytime.' },
 ]
 
 export function CaptivePortal({ initialPackages, mikrotikParams }: CaptivePortalProps) {
@@ -205,14 +205,14 @@ export function CaptivePortal({ initialPackages, mikrotikParams }: CaptivePortal
   const selectedPackage = initialPackages.find((p) => p.id === selectedPkgId)
 
   return (
-    <div className="min-h-screen bg-[#EDF1F6] text-[#0D1B2A] py-6 px-4 font-sans antialiased selection:bg-[#1466B8]/10">
+    <div className="min-h-screen bg-kumo-brand text-cream py-6 px-4 font-sans antialiased selection:bg-selection-bg selection:text-cream">
       <div className="max-w-[460px] mx-auto">
         
         {/* ============ CNA DETECTED WARNING ============ */}
         {isCna && (
-          <div className="mb-4 bg-amber-50 border border-amber-200 rounded-xl p-3.5 flex items-start gap-3 shadow-sm">
-            <ShieldAlert className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-            <div className="text-xs text-amber-900 leading-relaxed">
+          <div className="mb-4 bg-canvas/10 border border-canvas/20 rounded-lg p-3.5 flex items-start gap-3 shadow-sm">
+            <ShieldAlert className="w-5 h-5 text-cream shrink-0 mt-0.5" />
+            <div className="text-xs text-cream leading-relaxed">
               <span className="font-bold">Captive Portal Browser Detected:</span> Please copy or screenshot your login credentials when generated before closing this screen.
             </div>
           </div>
@@ -221,36 +221,36 @@ export function CaptivePortal({ initialPackages, mikrotikParams }: CaptivePortal
         {/* ============ TOP BAR ============ */}
         <header className="flex items-center justify-between mb-4 px-0.5">
           <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#1466B8] to-[#0C3358] flex items-center justify-center shadow-md shadow-[#0C3358]/25 shrink-0">
+            <div className="w-10 h-10 rounded-full bg-cream flex items-center justify-center shrink-0">
               <svg viewBox="0 0 28 28" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
-                <rect x="4" y="16" width="3.4" height="8" rx="1.4" fill="#fff" opacity=".55" />
-                <rect x="9.3" y="12" width="3.4" height="12" rx="1.4" fill="#fff" opacity=".8" />
-                <rect x="14.6" y="7" width="3.4" height="17" rx="1.4" fill="#fff" />
-                <circle cx="21.6" cy="8.6" r="2.2" fill="#05C46B" />
+                <rect x="4" y="16" width="3.4" height="8" rx="1.4" fill="#ff5e1f" opacity=".55" />
+                <rect x="9.3" y="12" width="3.4" height="12" rx="1.4" fill="#ff5e1f" opacity=".8" />
+                <rect x="14.6" y="7" width="3.4" height="17" rx="1.4" fill="#ff5e1f" />
+                <circle cx="21.6" cy="8.6" r="2.2" fill="#262626" />
               </svg>
             </div>
             <div>
-              <h1 className="font-extrabold text-[15px] tracking-tight leading-tight">Motion Connect</h1>
-              <p className="font-medium text-[11px] text-[#667891] tracking-wide">Campus Student Wi-Fi</p>
+              <h1 className="font-medium text-[16px] tracking-tight leading-tight text-cream">Motion Connect</h1>
+              <p className="font-mono text-[12px] text-cream/80 tracking-wide">Campus Student Wi-Fi</p>
             </div>
           </div>
-          <div className="inline-flex items-center gap-1.5 text-[11px] font-bold tracking-wider text-[#04482A] bg-[#05C46B]/15 border border-[#05C46B]/30 px-2.5 py-1 rounded-full">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#05C46B] animate-pulse shadow-[0_0_8px_#05C46B]" />
+          <div className="inline-flex items-center gap-1.5 font-mono text-[12px] font-bold tracking-wider text-ink bg-cream border border-cream/30 px-2.5 py-1 rounded-full">
+            <span className="w-1.5 h-1.5 rounded-full bg-ai animate-pulse shadow-[0_0_8px_#00bd7d]" />
             LIVE
           </div>
         </header>
 
         {/* ============ ROTATING PROMO BANNER ============ */}
-        <div className="relative overflow-hidden bg-gradient-to-br from-[#0C3358] to-[#1466B8] rounded-2xl p-3.5 mb-3.5 shadow-sm text-white min-h-[64px] flex flex-col justify-between">
-          <span className="absolute top-2.5 right-3 text-[9px] font-extrabold tracking-widest text-white/50 uppercase">
+        <div className="relative overflow-hidden bg-kumo-brand-dark rounded-lg p-3.5 mb-3.5 text-cream min-h-[64px] flex flex-col justify-between border border-white/10">
+          <span className="absolute top-2.5 right-3 text-[10px] font-mono tracking-widest text-cream/60 uppercase">
             OFFERS
           </span>
           <div className="transition-all duration-300 pr-12">
-            <div className="flex items-center gap-2 font-extrabold text-[13.5px] tracking-tight text-white mb-0.5">
+            <div className="flex items-center gap-2 font-medium text-[14px] tracking-tight text-cream mb-0.5">
               {PROMOS[promoIdx].icon}
               <span>{PROMOS[promoIdx].head}</span>
             </div>
-            <p className="text-[12px] text-white/80 leading-snug">{PROMOS[promoIdx].sub}</p>
+            <p className="font-mono text-[12px] text-cream/80 leading-snug">{PROMOS[promoIdx].sub}</p>
           </div>
           <div className="flex gap-1.5 mt-2.5">
             {PROMOS.map((_, idx) => (
@@ -258,7 +258,7 @@ export function CaptivePortal({ initialPackages, mikrotikParams }: CaptivePortal
                 key={idx}
                 onClick={() => setPromoIdx(idx)}
                 className={`h-1 rounded-full transition-all duration-300 ${
-                  idx === promoIdx ? 'w-4 bg-white' : 'w-1 bg-white/35 hover:bg-white/60'
+                  idx === promoIdx ? 'w-4 bg-cream' : 'w-1 bg-cream/35 hover:bg-cream/60'
                 }`}
                 aria-label={`Promo slide ${idx + 1}`}
               />
@@ -267,14 +267,14 @@ export function CaptivePortal({ initialPackages, mikrotikParams }: CaptivePortal
         </div>
 
         {/* ============ TABS ============ */}
-        <div className="grid grid-cols-2 gap-1 bg-white border border-[#E1E8F0] rounded-xl p-1 mb-3.5 shadow-sm">
+        <div className="grid grid-cols-2 gap-1 bg-kumo-brand-dark rounded-lg p-1 mb-3.5 border border-white/10">
           <button
             type="button"
             onClick={() => setActiveTab('buy')}
-            className={`py-2 px-3 rounded-lg font-bold text-sm transition-all ${
+            className={`py-2 px-3 rounded-md font-mono font-medium text-xs transition-all ${
               activeTab === 'buy' || activeTab === 'creds'
-                ? 'bg-[#1466B8] text-white shadow-sm'
-                : 'text-[#667891] hover:text-[#0D1B2A] hover:bg-zinc-50'
+                ? 'bg-canvas text-ink shadow-sm'
+                : 'text-cream/80 hover:text-cream hover:bg-white/5'
             }`}
           >
             Buy internet
@@ -282,10 +282,10 @@ export function CaptivePortal({ initialPackages, mikrotikParams }: CaptivePortal
           <button
             type="button"
             onClick={() => setActiveTab('login')}
-            className={`py-2 px-3 rounded-lg font-bold text-sm transition-all ${
+            className={`py-2 px-3 rounded-md font-mono font-medium text-xs transition-all ${
               activeTab === 'login'
-                ? 'bg-[#1466B8] text-white shadow-sm'
-                : 'text-[#667891] hover:text-[#0D1B2A] hover:bg-zinc-50'
+                ? 'bg-canvas text-ink shadow-sm'
+                : 'text-cream/80 hover:text-cream hover:bg-white/5'
             }`}
           >
             I have an account
@@ -294,8 +294,8 @@ export function CaptivePortal({ initialPackages, mikrotikParams }: CaptivePortal
 
         {/* ============ PANEL: BUY INTERNET ============ */}
         {(activeTab === 'buy' || (activeTab === 'creds' && !creds)) && (
-          <div className="bg-white border border-[#E1E8F0] rounded-2xl shadow-sm p-4.5 transition-all">
-            <p className="text-[11px] font-extrabold tracking-widest text-[#667891] uppercase mb-3">
+          <div className="bg-canvas border border-hairline rounded-lg shadow-sm p-4.5 transition-all text-ink">
+            <p className="font-mono text-[12px] tracking-widest text-muted uppercase mb-3">
               Choose your plan
             </p>
             
@@ -309,10 +309,10 @@ export function CaptivePortal({ initialPackages, mikrotikParams }: CaptivePortal
                     key={pkg.id}
                     type="button"
                     onClick={() => setSelectedPkgId(pkg.id)}
-                    className={`w-full text-left grid grid-cols-[auto_1fr_auto] items-center gap-3 p-3.5 rounded-xl border-2 transition-all cursor-pointer ${
+                    className={`w-full text-left grid grid-cols-[auto_1fr_auto] items-center gap-3 p-3.5 rounded-lg border-2 transition-all cursor-pointer ${
                       isSelected
-                        ? 'border-[#05C46B] bg-[#05C46B]/[0.04] shadow-[0_0_0_3px_rgba(5,196,107,0.12)]'
-                        : 'border-[#E1E8F0] bg-white hover:border-[#CBD6E2]'
+                        ? 'border-kumo-brand bg-kumo-brand/5'
+                        : 'border-hairline bg-canvas hover:border-kumo-brand/40'
                     }`}
                   >
                     {/* Signal Bars Visual */}
@@ -323,8 +323,8 @@ export function CaptivePortal({ initialPackages, mikrotikParams }: CaptivePortal
                         return (
                           <span
                             key={bar}
-                            className={`w-1 rounded-sm transition-colors ${heights[bar - 1]} ${
-                              isOn ? (isSelected ? 'bg-[#05C46B]' : 'bg-[#1466B8]') : 'bg-[#CBD6E2]'
+                            className={`w-1 rounded-[1px] transition-colors ${heights[bar - 1]} ${
+                              isOn ? (isSelected ? 'bg-kumo-brand' : 'bg-ink') : 'bg-hairline'
                             }`}
                           />
                         )
@@ -333,16 +333,16 @@ export function CaptivePortal({ initialPackages, mikrotikParams }: CaptivePortal
 
                     {/* Package Name & Meta */}
                     <div className="min-w-0">
-                      <div className="font-bold text-[15px] text-[#0D1B2A] truncate">{pkg.name}</div>
-                      <div className="text-[12px] text-[#667891] mt-0.5 truncate">
+                      <div className="font-medium text-[15px] text-ink truncate">{pkg.name}</div>
+                      <div className="font-mono text-[12px] text-muted mt-0.5 truncate">
                         {pkg.data_limit} · {pkg.duration_label}
                       </div>
                     </div>
 
                     {/* Amount */}
                     <div className="text-right shrink-0">
-                      <span className="text-[11px] font-bold text-[#667891] mr-0.5">GHS</span>
-                      <span className="text-[18px] font-extrabold tracking-tight text-[#0D1B2A]">
+                      <span className="font-mono text-[12px] text-muted mr-0.5">GHS</span>
+                      <span className="font-medium tracking-tight text-[18px] text-ink">
                         {pkg.amount.toFixed(2)}
                       </span>
                     </div>
@@ -353,7 +353,7 @@ export function CaptivePortal({ initialPackages, mikrotikParams }: CaptivePortal
 
             {/* MoMo Number Field */}
             <div className="mt-4">
-              <label htmlFor="phone" className="block text-xs font-bold text-[#3A4A5E] mb-1.5 tracking-wide">
+              <label htmlFor="phone" className="block font-mono text-[12px] text-ink-soft mb-1.5 tracking-wide">
                 Mobile Money number
               </label>
               <input
@@ -365,16 +365,16 @@ export function CaptivePortal({ initialPackages, mikrotikParams }: CaptivePortal
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 maxLength={15}
-                className="w-full font-medium text-base text-[#0D1B2A] bg-[#F7F9FC] border-2 border-[#CBD6E2] rounded-xl py-3 px-3.5 focus:outline-none focus:border-[#1466B8] focus:bg-white focus:shadow-[0_0_0_3px_rgba(20,102,184,0.15)] transition-all placeholder:text-[#667891]/60"
+                className="w-full font-sans text-[16px] text-ink bg-canvas border border-hairline rounded-md py-3 px-3.5 focus:outline-none focus:border-kumo-brand focus:ring-1 focus:ring-kumo-brand transition-all placeholder:text-muted/60"
               />
-              <p className="text-[11.5px] text-[#667891] mt-1.5">
+              <p className="font-mono text-[11.5px] text-muted mt-1.5">
                 You&apos;ll receive a prompt on this number to approve payment.
               </p>
             </div>
 
             {/* Error Message Banner */}
             {errorMsg && (
-              <div className="mt-3.5 bg-[#D64545]/10 border border-[#D64545]/30 text-[#D64545] text-[13px] font-semibold py-2.5 px-3.5 rounded-xl flex items-center gap-2">
+              <div className="mt-3.5 bg-emergency-red/10 border border-emergency-red/20 text-emergency-red text-[13px] font-medium py-2.5 px-3.5 rounded-md flex items-center gap-2">
                 <ShieldAlert className="w-4 h-4 shrink-0" />
                 <span>{errorMsg}</span>
               </div>
@@ -385,7 +385,7 @@ export function CaptivePortal({ initialPackages, mikrotikParams }: CaptivePortal
               type="button"
               onClick={handleStartPayment}
               disabled={!selectedPkgId || phone.replace(/\D/g, '').length < 9 || isProcessing}
-              className="w-full mt-4 font-extrabold text-[15px] bg-[#05C46B] text-[#04331E] rounded-xl py-3.5 px-4 flex items-center justify-center gap-2 cursor-pointer shadow-sm hover:brightness-105 active:translate-y-0.5 transition-all disabled:opacity-55 disabled:cursor-not-allowed disabled:hover:brightness-100"
+              className="w-full mt-4 font-medium text-[15px] bg-ink text-cream rounded-full py-3.5 px-4 flex items-center justify-center gap-2 cursor-pointer shadow-sm hover:brightness-110 active:translate-y-0.5 transition-all disabled:opacity-55 disabled:cursor-not-allowed disabled:hover:brightness-100"
             >
               <Lock className="w-4 h-4" />
               <span>
@@ -399,8 +399,8 @@ export function CaptivePortal({ initialPackages, mikrotikParams }: CaptivePortal
 
         {/* ============ PANEL: EXISTING CLIENT LOGIN (MikroTik) ============ */}
         {activeTab === 'login' && (
-          <div className="bg-white border border-[#E1E8F0] rounded-2xl shadow-sm p-4.5 transition-all">
-            <p className="text-[11px] font-extrabold tracking-widest text-[#667891] uppercase mb-3">
+          <div className="bg-canvas border border-hairline rounded-lg shadow-sm p-4.5 transition-all text-ink">
+            <p className="font-mono text-[12px] tracking-widest text-muted uppercase mb-3">
               Existing client login
             </p>
 
@@ -411,7 +411,7 @@ export function CaptivePortal({ initialPackages, mikrotikParams }: CaptivePortal
 
               <div className="space-y-3.5">
                 <div>
-                  <label htmlFor="username" className="block text-xs font-bold text-[#3A4A5E] mb-1.5 tracking-wide">
+                  <label htmlFor="username" className="block font-mono text-[12px] text-ink-soft mb-1.5 tracking-wide">
                     Username / Voucher Code
                   </label>
                   <input
@@ -423,12 +423,12 @@ export function CaptivePortal({ initialPackages, mikrotikParams }: CaptivePortal
                     value={loginUser}
                     onChange={(e) => setLoginUser(e.target.value)}
                     required
-                    className="w-full font-medium text-base text-[#0D1B2A] bg-[#F7F9FC] border-2 border-[#CBD6E2] rounded-xl py-3 px-3.5 focus:outline-none focus:border-[#1466B8] focus:bg-white focus:shadow-[0_0_0_3px_rgba(20,102,184,0.15)] transition-all placeholder:text-[#667891]/60"
+                    className="w-full font-sans text-[16px] text-ink bg-canvas border border-hairline rounded-md py-3 px-3.5 focus:outline-none focus:border-kumo-brand focus:ring-1 focus:ring-kumo-brand transition-all placeholder:text-muted/60"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="password" className="block text-xs font-bold text-[#3A4A5E] mb-1.5 tracking-wide">
+                  <label htmlFor="password" className="block font-mono text-[12px] text-ink-soft mb-1.5 tracking-wide">
                     Password
                   </label>
                   <input
@@ -439,13 +439,13 @@ export function CaptivePortal({ initialPackages, mikrotikParams }: CaptivePortal
                     placeholder="Enter password (if applicable)"
                     value={loginPass}
                     onChange={(e) => setLoginPass(e.target.value)}
-                    className="w-full font-medium text-base text-[#0D1B2A] bg-[#F7F9FC] border-2 border-[#CBD6E2] rounded-xl py-3 px-3.5 focus:outline-none focus:border-[#1466B8] focus:bg-white focus:shadow-[0_0_0_3px_rgba(20,102,184,0.15)] transition-all placeholder:text-[#667891]/60"
+                    className="w-full font-sans text-[16px] text-ink bg-canvas border border-hairline rounded-md py-3 px-3.5 focus:outline-none focus:border-kumo-brand focus:ring-1 focus:ring-kumo-brand transition-all placeholder:text-muted/60"
                   />
                 </div>
               </div>
 
               {mikrotikParams?.error && (
-                <div className="mt-3.5 bg-[#D64545]/10 border border-[#D64545]/30 text-[#D64545] text-[13px] font-semibold py-2.5 px-3.5 rounded-xl flex items-center gap-2">
+                <div className="mt-3.5 bg-emergency-red/10 border border-emergency-red/20 text-emergency-red text-[13px] font-medium py-2.5 px-3.5 rounded-md flex items-center gap-2">
                   <ShieldAlert className="w-4 h-4 shrink-0" />
                   <span>{mikrotikParams.error}</span>
                 </div>
@@ -453,7 +453,7 @@ export function CaptivePortal({ initialPackages, mikrotikParams }: CaptivePortal
 
               <button
                 type="submit"
-                className="w-full mt-4 font-extrabold text-[15px] bg-[#1466B8] text-white rounded-xl py-3.5 px-4 flex items-center justify-center gap-2 cursor-pointer shadow-sm hover:brightness-110 active:translate-y-0.5 transition-all"
+                className="w-full mt-4 font-medium text-[15px] bg-ink text-cream rounded-full py-3.5 px-4 flex items-center justify-center gap-2 cursor-pointer shadow-sm hover:brightness-110 active:translate-y-0.5 transition-all"
               >
                 <span>Connect to Wi-Fi</span>
                 <ArrowRight className="w-4 h-4" />
@@ -464,44 +464,44 @@ export function CaptivePortal({ initialPackages, mikrotikParams }: CaptivePortal
 
         {/* ============ PANEL: CREDENTIALS RESULT ============ */}
         {activeTab === 'creds' && creds && (
-          <div className="bg-white border border-[#E1E8F0] rounded-2xl shadow-sm p-5 transition-all">
+          <div className="bg-canvas border border-hairline rounded-lg shadow-sm p-5 transition-all text-ink">
             <div className="flex items-center gap-2.5 mb-1">
-              <div className="w-8 h-8 rounded-full bg-[#05C46B] text-white flex items-center justify-center shrink-0 shadow-sm">
+              <div className="w-8 h-8 rounded-full bg-ai text-cream flex items-center justify-center shrink-0 shadow-sm">
                 <CheckCircle2 className="w-5 h-5" />
               </div>
-              <h2 className="font-extrabold text-lg text-[#0D1B2A]">Payment Successful!</h2>
+              <h2 className="font-medium text-lg text-ink">Payment Successful!</h2>
             </div>
-            <p className="text-[13px] text-[#667891] mb-4">
+            <p className="font-mono text-[12px] text-muted mb-4">
               Your Wi-Fi credentials have been activated. Please save them safely.
             </p>
 
             {/* Credentials Card Table */}
-            <div className="divide-y divide-[#E1E8F0] border-t border-b border-[#E1E8F0] my-3">
+            <div className="divide-y divide-hairline border-t border-b border-hairline my-3">
               <div className="py-2.5 flex justify-between items-center">
-                <span className="text-xs font-semibold text-[#667891]">Voucher Code</span>
-                <span className="text-[16px] font-black tracking-wide text-[#0C3358] bg-blue-50 px-2 py-0.5 rounded border border-blue-100">
+                <span className="font-mono text-[12px] text-muted">Voucher Code</span>
+                <span className="font-mono text-[16px] font-bold tracking-wide text-ink bg-hairline/50 px-2 py-0.5 rounded-md border border-hairline">
                   {creds.voucher}
                 </span>
               </div>
               <div className="py-2 flex justify-between items-center text-sm">
-                <span className="text-xs font-semibold text-[#667891]">Username</span>
-                <span className="font-bold text-[#0D1B2A]">{creds.username}</span>
+                <span className="font-mono text-[12px] text-muted">Username</span>
+                <span className="font-medium text-ink">{creds.username}</span>
               </div>
               <div className="py-2 flex justify-between items-center text-sm">
-                <span className="text-xs font-semibold text-[#667891]">Password</span>
-                <span className="font-bold text-[#0D1B2A]">{creds.password}</span>
+                <span className="font-mono text-[12px] text-muted">Password</span>
+                <span className="font-medium text-ink">{creds.password}</span>
               </div>
               <div className="py-2 flex justify-between items-center text-sm">
-                <span className="text-xs font-semibold text-[#667891]">Profile</span>
-                <span className="font-bold text-[#0D1B2A] capitalize">{creds.profile}</span>
+                <span className="font-mono text-[12px] text-muted">Profile</span>
+                <span className="font-medium text-ink capitalize">{creds.profile}</span>
               </div>
               <div className="py-2 flex justify-between items-center text-sm">
-                <span className="text-xs font-semibold text-[#667891]">Expiry Date</span>
-                <span className="font-bold text-[#0D1B2A]">{creds.expiry}</span>
+                <span className="font-mono text-[12px] text-muted">Expiry Date</span>
+                <span className="font-medium text-ink">{creds.expiry}</span>
               </div>
               <div className="py-2 flex justify-between items-center text-sm">
-                <span className="text-xs font-semibold text-[#667891]">SMS Notification</span>
-                <span className="font-bold text-[#05C46B]">{creds.sms}</span>
+                <span className="font-mono text-[12px] text-muted">SMS Notification</span>
+                <span className="font-medium text-ai">{creds.sms}</span>
               </div>
             </div>
 
@@ -509,50 +509,48 @@ export function CaptivePortal({ initialPackages, mikrotikParams }: CaptivePortal
               <button
                 type="button"
                 onClick={handleCopyCreds}
-                className="w-full font-bold text-sm bg-zinc-100 text-[#0D1B2A] border border-[#CBD6E2] rounded-xl py-3 px-3 flex items-center justify-center gap-1.5 hover:bg-zinc-200 transition-all"
+                className="w-full font-medium text-sm bg-canvas text-ink border border-hairline rounded-full py-3 px-3 flex items-center justify-center gap-1.5 hover:bg-hairline/50 transition-all"
               >
-                {copied ? <Check className="w-4 h-4 text-[#05C46B]" /> : <Copy className="w-4 h-4 text-[#667891]" />}
+                {copied ? <Check className="w-4 h-4 text-ai" /> : <Copy className="w-4 h-4 text-muted" />}
                 <span>{copied ? 'Copied!' : 'Copy Info'}</span>
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  setActiveTab('login')
-                }}
-                className="w-full font-extrabold text-sm bg-[#1466B8] text-white rounded-xl py-3 px-3 flex items-center justify-center gap-1.5 shadow-sm hover:brightness-110 transition-all"
+                onClick={() => setActiveTab('login')}
+                className="w-full font-medium text-sm bg-ink text-cream rounded-full py-3 px-3 flex items-center justify-center gap-1.5 shadow-sm hover:brightness-110 transition-all"
               >
                 <span>Login Now</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
 
-            <p className="text-center text-xs text-[#667891] mt-3.5">
-              Auto switching to login form in <strong className="text-[#0D1B2A]">{countdown}s</strong>…
+            <p className="text-center font-mono text-[11px] text-muted mt-3.5">
+              Auto switching to login form in <strong className="text-ink">{countdown}s</strong>…
             </p>
           </div>
         )}
 
         {/* ============ FOOTER ============ */}
-        <footer className="text-center text-xs text-[#667891] mt-5 mb-2 leading-relaxed space-y-1">
+        <footer className="text-center font-mono text-[12px] text-cream/70 mt-5 mb-2 leading-relaxed space-y-1">
           <div>
             Need help?{' '}
-            <a href="tel:+233508135559" className="text-[#1466B8] font-semibold hover:underline">
+            <a href="tel:+233508135559" className="text-cream font-medium hover:underline">
               Call Support
             </a>{' '}
             ·{' '}
-            <a href="https://wa.me/233508135559" target="_blank" rel="noopener noreferrer" className="text-[#1466B8] font-semibold hover:underline">
+            <a href="https://wa.me/233508135559" target="_blank" rel="noopener noreferrer" className="text-cream font-medium hover:underline">
               WhatsApp
             </a>{' '}
             ·{' '}
             <button
               type="button"
               onClick={() => setActiveTab('buy')}
-              className="text-[#1466B8] font-semibold hover:underline bg-transparent border-0 cursor-pointer p-0 font-sans"
+              className="text-cream font-medium hover:underline bg-transparent border-0 cursor-pointer p-0 font-mono"
             >
               How to buy data
             </button>
           </div>
-          <div className="text-[11px] text-[#667891]/80">
+          <div className="text-[11px] text-cream/50">
             © {new Date().getFullYear()} Motion Connect · Powered by Secure Mobile Money & Starlink
           </div>
         </footer>
@@ -560,15 +558,15 @@ export function CaptivePortal({ initialPackages, mikrotikParams }: CaptivePortal
 
       {/* ============ PAYMENT PROCESSING OVERLAY ============ */}
       {isProcessing && (
-        <div className="fixed inset-0 z-50 bg-[#0D1B2A]/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl p-7 max-w-[340px] w-full text-center shadow-xl border border-[#E1E8F0] animate-in fade-in zoom-in-95 duration-200">
-            <div className="w-12 h-12 mx-auto mb-4 rounded-full border-4 border-[#E1E8F0] border-t-[#05C46B] animate-spin" />
-            <h3 className="font-extrabold text-lg text-[#0D1B2A] mb-1.5">{ovTitle}</h3>
-            <p className="text-sm text-[#667891] leading-relaxed mb-4">{ovMsg}</p>
+        <div className="fixed inset-0 z-50 bg-ink/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-canvas rounded-lg p-7 max-w-[340px] w-full text-center shadow-xl border border-hairline animate-in fade-in zoom-in-95 duration-200">
+            <div className="w-12 h-12 mx-auto mb-4 rounded-full border-4 border-hairline border-t-kumo-brand animate-spin" />
+            <h3 className="font-medium text-lg text-ink mb-1.5">{ovTitle}</h3>
+            <p className="font-mono text-[12px] text-muted leading-relaxed mb-4">{ovMsg}</p>
             {checkoutUrl && (
               <a
                 href={checkoutUrl}
-                className="inline-flex items-center justify-center gap-1.5 w-full py-3 px-4 rounded-xl bg-[#1466B8] text-white font-extrabold text-xs shadow-md hover:brightness-110 transition-all cursor-pointer mt-2"
+                className="inline-flex items-center justify-center gap-1.5 w-full py-3 px-4 rounded-full bg-ink text-cream font-medium text-xs shadow-md hover:brightness-110 transition-all cursor-pointer mt-2"
               >
                 <span>🔗 Open MoMo Checkout Simulator</span>
               </a>

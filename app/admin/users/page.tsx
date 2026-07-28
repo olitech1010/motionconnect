@@ -26,12 +26,12 @@ export default async function SubscribersPage() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-black text-[#0D1B2A]">Hotspot Subscribers & Live Sessions</h1>
-            <span className="px-2.5 py-0.5 rounded-full bg-[#05C46B]/15 text-[#05C46B] text-xs font-black uppercase tracking-wider flex items-center gap-1">
+            <h1 className="text-2xl font-medium text-ink tracking-tight">Hotspot Subscribers & Live Sessions</h1>
+            <span className="px-2.5 py-0.5 rounded-full bg-ai/10 text-ai text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
               <Activity className="w-3 h-3 animate-pulse" /> Live Telemetry
             </span>
           </div>
-          <p className="text-zinc-600 text-sm mt-1">
+          <p className="font-mono text-[12px] text-muted mt-1">
             Real-time tracking of connected devices, MAC addresses, IP allocations, data usage, and voucher expiration.
           </p>
         </div>
@@ -39,67 +39,67 @@ export default async function SubscribersPage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white p-5 rounded-2xl border border-zinc-200/80 shadow-sm flex items-center justify-between">
+        <div className="bg-canvas p-5 rounded-lg border border-hairline shadow-sm flex items-center justify-between hover:border-kumo-brand transition-colors">
           <div>
-            <p className="text-xs font-extrabold uppercase tracking-wider text-zinc-400">Total Subscribers</p>
-            <p className="text-2xl font-black text-[#0D1B2A] mt-1">{totalSubscribers}</p>
+            <p className="font-mono text-[11px] font-bold uppercase tracking-wider text-muted">Total Subscribers</p>
+            <p className="text-2xl font-medium tracking-tight text-ink mt-1">{totalSubscribers}</p>
           </div>
-          <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center text-[#1466B8]">
+          <div className="w-12 h-12 rounded-md bg-compute/10 flex items-center justify-center text-compute">
             <Users className="w-6 h-6" />
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl border border-zinc-200/80 shadow-sm flex items-center justify-between">
+        <div className="bg-canvas p-5 rounded-lg border border-hairline shadow-sm flex items-center justify-between hover:border-storage transition-colors">
           <div>
-            <p className="text-xs font-extrabold uppercase tracking-wider text-zinc-400">Currently Online</p>
-            <p className="text-2xl font-black text-[#05C46B] mt-1">{currentlyOnline}</p>
+            <p className="font-mono text-[11px] font-bold uppercase tracking-wider text-muted">Currently Online</p>
+            <p className="text-2xl font-medium tracking-tight text-storage mt-1">{currentlyOnline}</p>
           </div>
-          <div className="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center text-[#05C46B]">
+          <div className="w-12 h-12 rounded-md bg-storage/10 flex items-center justify-center text-storage">
             <Wifi className="w-6 h-6" />
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl border border-zinc-200/80 shadow-sm flex items-center justify-between">
+        <div className="bg-canvas p-5 rounded-lg border border-hairline shadow-sm flex items-center justify-between hover:border-ai transition-colors">
           <div>
-            <p className="text-xs font-extrabold uppercase tracking-wider text-zinc-400">Total Data Consumed</p>
-            <p className="text-2xl font-black text-[#0D1B2A] mt-1">{totalDataUsedMB.toFixed(1)} MB</p>
+            <p className="font-mono text-[11px] font-bold uppercase tracking-wider text-muted">Total Data Consumed</p>
+            <p className="text-2xl font-medium tracking-tight text-ink mt-1">{totalDataUsedMB.toFixed(1)} MB</p>
           </div>
-          <div className="w-12 h-12 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600">
+          <div className="w-12 h-12 rounded-md bg-ai/10 flex items-center justify-center text-ai">
             <Activity className="w-6 h-6" />
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl border border-zinc-200/80 shadow-sm flex items-center justify-between">
+        <div className="bg-canvas p-5 rounded-lg border border-hairline shadow-sm flex items-center justify-between hover:border-kumo-brand-soft transition-colors">
           <div>
-            <p className="text-xs font-extrabold uppercase tracking-wider text-zinc-400">MikroTik Router Sync</p>
-            <p className="text-lg font-black text-emerald-600 mt-1 flex items-center gap-1.5">
+            <p className="font-mono text-[11px] font-bold uppercase tracking-wider text-muted">MikroTik Router Sync</p>
+            <p className="text-lg font-medium tracking-tight text-storage mt-1 flex items-center gap-1.5">
               <ShieldCheck className="w-5 h-5" /> Active
             </p>
           </div>
-          <div className="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600">
+          <div className="w-12 h-12 rounded-md bg-kumo-brand-soft/10 flex items-center justify-center text-kumo-brand-soft">
             <RefreshCw className="w-6 h-6" />
           </div>
         </div>
       </div>
 
       {/* Subscribers Table */}
-      <div className="bg-white rounded-2xl border border-zinc-200/80 shadow-sm overflow-hidden">
-        <div className="p-5 border-b border-zinc-100 flex items-center justify-between">
-          <h2 className="font-extrabold text-[#0D1B2A]">Authenticated Hotspot Users ({subscribers.length})</h2>
-          <span className="text-xs text-zinc-500 font-medium">Sorted by recent authentication</span>
+      <div className="bg-canvas rounded-lg border border-hairline shadow-sm overflow-hidden">
+        <div className="p-5 border-b border-hairline flex items-center justify-between">
+          <h2 className="font-medium text-ink">Authenticated Hotspot Users ({subscribers.length})</h2>
+          <span className="font-mono text-[12px] text-muted font-bold">Sorted by recent authentication</span>
         </div>
 
         {subscribers.length === 0 ? (
-          <div className="p-12 text-center text-zinc-500">
-            <AlertCircle className="w-10 h-10 mx-auto text-zinc-300 mb-3" />
-            <p className="font-bold text-zinc-700">No active subscribers found</p>
-            <p className="text-xs mt-1">Once users complete payment on the portal, their device telemetry will appear here.</p>
+          <div className="p-12 text-center text-muted">
+            <AlertCircle className="w-10 h-10 mx-auto text-ink-soft mb-3" />
+            <p className="font-medium text-ink">No active subscribers found</p>
+            <p className="font-mono text-[12px] mt-1">Once users complete payment on the portal, their device telemetry will appear here.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-zinc-100 bg-zinc-50/50 text-[11px] font-extrabold uppercase tracking-wider text-zinc-500">
+                <tr className="border-b border-hairline bg-hairline/30 font-mono text-[10px] font-bold uppercase tracking-wider text-muted">
                   <th className="py-3 px-4">Subscriber Details</th>
                   <th className="py-3 px-4">Device & Telemetry</th>
                   <th className="py-3 px-4">Package Plan</th>
@@ -108,7 +108,7 @@ export default async function SubscribersPage() {
                   <th className="py-3 px-4">Expiration</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-100 text-sm">
+              <tbody className="divide-y divide-hairline text-sm text-ink font-medium">
                 {subscribers.map((sub) => {
                   const isOnline = sub.mac_address && activeMacs.has(sub.mac_address.toUpperCase())
                   const activeSession = activeSessions.find(
@@ -122,58 +122,58 @@ export default async function SubscribersPage() {
                   const isExpired = sub.expires_at ? new Date(sub.expires_at) < new Date() : false
 
                   return (
-                    <tr key={sub.id} className="hover:bg-zinc-50/50 transition-colors">
+                    <tr key={sub.id} className="hover:bg-hairline/30 transition-colors">
                       <td className="py-3.5 px-4">
-                        <div className="font-extrabold text-[#0D1B2A]">{sub.phone}</div>
-                        <div className="text-xs text-zinc-500 font-mono mt-0.5">Voucher: {sub.voucher_code || 'N/A'}</div>
+                        <div className="font-bold">{sub.phone}</div>
+                        <div className="text-[12px] text-muted font-mono mt-0.5">Voucher: {sub.voucher_code || 'N/A'}</div>
                       </td>
                       <td className="py-3.5 px-4">
-                        <div className="flex items-center gap-1.5 text-zinc-800 font-medium text-xs">
-                          <Smartphone className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
+                        <div className="flex items-center gap-1.5 text-ink-soft font-bold text-[12px]">
+                          <Smartphone className="w-3.5 h-3.5 text-muted shrink-0" />
                           <span className="truncate max-w-[200px]" title={sub.device_info || 'Unknown Device'}>
                             {sub.device_info || 'Unknown Device'}
                           </span>
                         </div>
-                        <div className="text-[11px] text-zinc-500 font-mono mt-1 flex items-center gap-3">
+                        <div className="text-[10px] text-muted font-mono mt-1 flex items-center gap-3">
                           <span>MAC: {sub.mac_address}</span>
                           {sub.ip_address && <span>IP: {sub.ip_address}</span>}
                         </div>
                       </td>
                       <td className="py-3.5 px-4">
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 text-[#1466B8] font-bold text-xs">
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-compute/10 text-compute font-bold text-[11px] font-mono">
                           {sub.package_name}
                         </span>
                       </td>
                       <td className="py-3.5 px-4">
                         {isOnline ? (
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-[#05C46B] font-extrabold text-xs">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#05C46B] animate-pulse"></span>
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-ai/10 text-ai font-bold text-[11px] font-mono border border-ai/20">
+                            <span className="w-1.5 h-1.5 rounded-full bg-ai animate-pulse"></span>
                             Online (Active)
                           </span>
                         ) : isExpired ? (
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-rose-50 text-rose-600 font-extrabold text-xs">
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emergency-red/10 text-emergency-red font-bold text-[11px] font-mono border border-emergency-red/20">
                             Expired
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-zinc-100 text-zinc-600 font-extrabold text-xs">
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-hairline text-ink-soft font-bold text-[11px] font-mono border border-hairline/50">
                             Offline (Valid)
                           </span>
                         )}
                       </td>
-                      <td className="py-3.5 px-4 font-mono text-xs font-bold text-zinc-700">
+                      <td className="py-3.5 px-4 font-mono text-[12px] font-bold text-ink">
                         {totalMB} MB
                         {activeSession?.uptime && (
-                          <div className="text-[10px] text-zinc-400 font-normal mt-0.5">Uptime: {activeSession.uptime}</div>
+                          <div className="text-[10px] text-muted font-normal mt-0.5">Uptime: {activeSession.uptime}</div>
                         )}
                       </td>
                       <td className="py-3.5 px-4">
                         {sub.expires_at ? (
-                          <div className="flex items-center gap-1 text-xs font-medium text-zinc-600">
-                            <Clock className="w-3.5 h-3.5 text-zinc-400" />
+                          <div className="flex items-center gap-1 text-[12px] font-mono text-ink-soft">
+                            <Clock className="w-3.5 h-3.5 text-muted" />
                             <span>{new Date(sub.expires_at).toLocaleString()}</span>
                           </div>
                         ) : (
-                          <span className="text-xs text-zinc-400 font-medium">No Expiration Set</span>
+                          <span className="font-mono text-[12px] text-muted">No Expiration Set</span>
                         )}
                       </td>
                     </tr>
