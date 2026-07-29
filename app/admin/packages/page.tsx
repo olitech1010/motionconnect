@@ -9,7 +9,7 @@ export default async function AdminPackagesPage() {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-canvas p-6 rounded-lg border border-hairline shadow-sm">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-canvas p-6 rounded-lg border border-hairline shadow-none">
         <div>
           <h1 className="text-2xl font-medium text-ink tracking-tight">Wi-Fi Packages & Pricing</h1>
           <p className="font-mono text-[12px] text-muted mt-1">
@@ -22,7 +22,7 @@ export default async function AdminPackagesPage() {
         {packages.map((pkg) => (
           <div
             key={pkg.id}
-            className="bg-canvas rounded-lg border border-hairline shadow-sm p-6 flex flex-col justify-between hover:border-kumo-brand transition-all group"
+            className="bg-canvas rounded-lg border border-hairline shadow-none p-6 flex flex-col justify-between hover:border-kumo-brand transition-all group"
           >
             <div>
               <div className="flex items-center justify-between mb-4">

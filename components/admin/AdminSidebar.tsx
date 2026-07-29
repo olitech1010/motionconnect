@@ -23,7 +23,7 @@ export function AdminSidebar() {
       <div>
         <div className="p-5 border-b border-hairline flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-[4px] bg-kumo-brand flex items-center justify-center font-bold text-cream text-base shadow-sm">
+            <div className="w-9 h-9 rounded-[4px] bg-kumo-brand flex items-center justify-center font-bold text-cream text-base shadow-none">
               MC
             </div>
             <div>
@@ -51,7 +51,7 @@ export function AdminSidebar() {
                 href={item.href}
                 className={`flex items-center gap-3 px-3.5 py-2.5 rounded-full font-medium text-sm transition-all ${
                   isActive
-                    ? 'bg-kumo-brand text-cream shadow-sm'
+                    ? 'bg-kumo-brand text-cream shadow-none'
                     : 'text-ink-soft hover:text-ink hover:bg-hairline/50'
                 }`}
               >

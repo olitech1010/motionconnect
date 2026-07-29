@@ -60,15 +60,15 @@ function DemoCheckoutContent() {
 
   return (
     <div className="min-h-screen bg-[#0A1520] flex items-center justify-center p-4 font-sans antialiased">
-      <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden border border-zinc-200">
+      <div className="w-full max-w-md bg-canvas rounded-3xl shadow-2xl overflow-hidden border border-zinc-200">
         {/* Hubtel Branding Header */}
-        <div className="bg-gradient-to-r from-[#1466B8] to-[#0C3358] p-6 text-white text-center relative">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-[11px] font-extrabold uppercase tracking-widest mb-3">
+        <div className="bg-gradient-to-r from-[#1466B8] to-[#0C3358] p-6 text-cream text-center relative">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-canvas/10 border border-white/20 text-[11px] font-extrabold uppercase tracking-widest mb-3">
             <ShieldCheck className="w-3.5 h-3.5 text-[#05C46B]" />
             <span>Hubtel PayProxy Sandbox</span>
           </div>
           <h1 className="text-xl font-black tracking-tight">Mobile Money Checkout</h1>
-          <p className="text-xs text-white/80 mt-1">Secure payment gateway simulation</p>
+          <p className="text-xs text-cream/80 mt-1">Secure payment gateway simulation</p>
         </div>
 
         {success ? (
@@ -144,7 +144,7 @@ function DemoCheckoutContent() {
                   value={pin}
                   onChange={(e) => setPin(e.target.value)}
                   placeholder="0000"
-                  className="w-full pl-10 pr-4 py-3 bg-zinc-50 border border-zinc-300 rounded-xl font-mono text-lg font-bold text-center tracking-[0.5em] focus:outline-none focus:border-[#1466B8] focus:bg-white transition-all"
+                  className="w-full pl-10 pr-4 py-3 bg-zinc-50 border border-zinc-300 rounded-xl font-mono text-lg font-bold text-center tracking-[0.5em] focus:outline-none focus:border-[#1466B8] focus:bg-canvas transition-all"
                 />
               </div>
               <p className="text-[11px] text-zinc-400 text-center font-medium">
@@ -157,7 +157,7 @@ function DemoCheckoutContent() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-[#05C46B] to-[#049d55] text-white font-extrabold text-sm shadow-lg shadow-[#05C46B]/25 hover:brightness-105 active:scale-[0.99] transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+                className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-[#05C46B] to-[#049d55] text-cream font-extrabold text-sm shadow-lg shadow-[#05C46B]/25 hover:brightness-105 active:scale-[0.99] transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
               >
                 {loading ? (
                   <>
@@ -193,7 +193,7 @@ export default function DemoCheckoutPage() {
     <Suspense
       fallback={
         <div className="min-h-screen bg-[#0A1520] flex items-center justify-center p-4">
-          <Loader2 className="w-8 h-8 animate-spin text-white" />
+          <Loader2 className="w-8 h-8 animate-spin text-cream" />
         </div>
       }
     >

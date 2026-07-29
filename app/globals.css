@@ -54,7 +54,6 @@
   --color-border: var(--color-hairline);
   --color-primary: var(--color-kumo-brand);
   --color-primary-foreground: var(--color-cream);
-  --color-muted: var(--color-hairline);
   --color-muted-foreground: var(--color-muted);
 }
 

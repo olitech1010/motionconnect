@@ -14,7 +14,7 @@ export default async function AdminDashboardPage() {
   return (
     <div className="space-y-8 animate-in fade-in duration-300">
       {/* Top Welcome Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-canvas p-6 rounded-lg border border-hairline shadow-sm">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-canvas p-6 rounded-lg border border-hairline shadow-none">
         <div>
           <h1 className="text-2xl font-medium text-ink tracking-tight">Dashboard Overview</h1>
           <p className="font-mono text-[12px] text-muted mt-1">
@@ -32,7 +32,7 @@ export default async function AdminDashboardPage() {
       {/* KPI Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {/* Revenue */}
-        <div className="bg-canvas p-6 rounded-lg border border-hairline shadow-sm relative overflow-hidden group hover:border-kumo-brand transition-all">
+        <div className="bg-canvas p-6 rounded-lg border border-hairline shadow-none relative overflow-hidden group hover:border-kumo-brand transition-all">
           <div className="flex items-center justify-between mb-3">
             <span className="font-mono text-[12px] font-bold uppercase tracking-wider text-muted">Total Revenue</span>
             <div className="w-10 h-10 rounded-md bg-compute/10 text-compute flex items-center justify-center">
@@ -49,7 +49,7 @@ export default async function AdminDashboardPage() {
         </div>
 
         {/* Active Vouchers */}
-        <div className="bg-canvas p-6 rounded-lg border border-hairline shadow-sm relative overflow-hidden group hover:border-storage transition-all">
+        <div className="bg-canvas p-6 rounded-lg border border-hairline shadow-none relative overflow-hidden group hover:border-storage transition-all">
           <div className="flex items-center justify-between mb-3">
             <span className="font-mono text-[12px] font-bold uppercase tracking-wider text-muted">Vouchers Issued</span>
             <div className="w-10 h-10 rounded-md bg-storage/10 text-storage flex items-center justify-center">
@@ -61,7 +61,7 @@ export default async function AdminDashboardPage() {
         </div>
 
         {/* Pending Approval */}
-        <div className="bg-canvas p-6 rounded-lg border border-hairline shadow-sm relative overflow-hidden group hover:border-kumo-brand-soft transition-all">
+        <div className="bg-canvas p-6 rounded-lg border border-hairline shadow-none relative overflow-hidden group hover:border-kumo-brand-soft transition-all">
           <div className="flex items-center justify-between mb-3">
             <span className="font-mono text-[12px] font-bold uppercase tracking-wider text-muted">Pending Approval</span>
             <div className="w-10 h-10 rounded-md bg-kumo-brand-soft/10 text-kumo-brand-soft flex items-center justify-center">
@@ -73,7 +73,7 @@ export default async function AdminDashboardPage() {
         </div>
 
         {/* System Health */}
-        <div className="bg-canvas p-6 rounded-lg border border-hairline shadow-sm relative overflow-hidden group hover:border-sase transition-all">
+        <div className="bg-canvas p-6 rounded-lg border border-hairline shadow-none relative overflow-hidden group hover:border-sase transition-all">
           <div className="flex items-center justify-between mb-3">
             <span className="font-mono text-[12px] font-bold uppercase tracking-wider text-muted">Router Health</span>
             <div className="w-10 h-10 rounded-md bg-sase/10 text-sase flex items-center justify-center">
@@ -86,7 +86,7 @@ export default async function AdminDashboardPage() {
       </div>
 
       {/* Recent Transactions Table */}
-      <div className="bg-canvas rounded-lg border border-hairline shadow-sm overflow-hidden">
+      <div className="bg-canvas rounded-lg border border-hairline shadow-none overflow-hidden">
         <div className="p-6 border-b border-hairline flex items-center justify-between">
           <div>
             <h2 className="text-lg font-medium text-ink">Recent Transactions</h2>
