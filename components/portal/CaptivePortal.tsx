@@ -60,11 +60,33 @@ export function CaptivePortal({ initialPackages, mikrotikParams }: CaptivePortal
     return /CaptiveNetwork|AppleWebKit.*Mobile.*|Dalvik.*|CaptivePortal/i.test(ua) && !/Safari/i.test(ua)
   })
 
+  // Restore or Save mikrotikParams
+  const [persistedParams, setPersistedParams] = useState(mikrotikParams)
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const stored = sessionStorage.getItem('motion_mikrotik_params')
+    
+    // If we have fresh params from URL that contain a MAC, save them
+    if (mikrotikParams?.mac) {
+      sessionStorage.setItem('motion_mikrotik_params', JSON.stringify(mikrotikParams))
+      setPersistedParams(mikrotikParams)
+    } 
+    // Otherwise, if we came back from a redirect and have no MAC, try to restore
+    else if (stored) {
+      try {
+        setPersistedParams(JSON.parse(stored))
+      } catch (e) {
+        // ignore JSON parse error
+      }
+    }
+  }, [mikrotikParams])
+
   // Existing MikroTik login form state
-  const [loginUser, setLoginUser] = useState(mikrotikParams?.username || '')
+  const [loginUser, setLoginUser] = useState(persistedParams?.username || '')
   const [loginPass, setLoginPass] = useState('')
-  const loginUrl = mikrotikParams?.loginUrl || 'http://10.0.0.1/login'
-  const dstUrl = mikrotikParams?.dst || 'http://www.google.com'
+  const loginUrl = persistedParams?.loginUrl || 'http://10.0.0.1/login'
+  const dstUrl = persistedParams?.dst || 'http://www.google.com'
 
   // Rotate promo banner every 4.5s
   useEffect(() => {
@@ -169,8 +191,8 @@ export function CaptivePortal({ initialPackages, mikrotikParams }: CaptivePortal
           packageId: selectedPkg.id,
           amount: selectedPkg.amount,
           phone: cleanPhone,
-          macAddress: mikrotikParams?.mac,
-          ipAddress: mikrotikParams?.ip,
+          macAddress: persistedParams?.mac,
+          ipAddress: persistedParams?.ip,
         }),
       })
 
