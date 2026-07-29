@@ -327,6 +327,23 @@ export function CaptivePortal({ initialPackages, mikrotikParams }: CaptivePortal
               })}
             </div>
 
+            {/* Customer Name Field */}
+            <div className="mt-4">
+              <label htmlFor="name" className="block text-xs font-bold text-[#3A4A5E] mb-1.5 tracking-wide">
+                Your full name (Optional)
+              </label>
+              <input
+                id="name"
+                type="text"
+                autoComplete="name"
+                placeholder="e.g. Clement Mensah"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                maxLength={50}
+                className="w-full font-medium text-base text-[#0D1B2A] bg-[#F7F9FC] border-2 border-[#CBD6E2] rounded-xl py-3 px-3.5 focus:outline-none focus:border-[#1466B8] focus:bg-white focus:shadow-[0_0_0_3px_rgba(20,102,184,0.15)] transition-all placeholder:text-[#667891]/60"
+              />
+            </div>
+
             {/* MoMo Number Field */}
             <div className="mt-4">
               <label htmlFor="phone" className="block text-xs font-bold text-[#3A4A5E] mb-1.5 tracking-wide">
