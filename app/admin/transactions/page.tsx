@@ -1,18 +1,11 @@
 import React from 'react'
-import { createAdminClient } from '@/lib/supabase/admin'
+import { TransactionService } from '@/services/transaction.service'
 import { TransactionsTable } from '@/components/admin/TransactionsTable'
 
 export const revalidate = 0
 
 export default async function AdminTransactionsPage() {
-  const supabase = createAdminClient()
-  const { data: txns } = await supabase
-    .from('transactions')
-    .select('*')
-    .order('created_at', { ascending: false })
-    .limit(100)
-
-  const transactions = txns || []
+  const transactions = await TransactionService.getAllTransactions()
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">

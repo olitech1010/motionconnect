@@ -78,6 +78,9 @@ export interface Database {
           mikrotik_synced: boolean
           error_message: string | null
           sms_status: 'sent' | 'failed' | null
+          device_info: string | null
+          data_used_bytes: number
+          expires_at: string | null
           created_at: string
           updated_at: string
         }
@@ -98,6 +101,9 @@ export interface Database {
           mikrotik_synced?: boolean
           error_message?: string | null
           sms_status?: 'sent' | 'failed' | null
+          device_info?: string | null
+          data_used_bytes?: number
+          expires_at?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -118,6 +124,9 @@ export interface Database {
           mikrotik_synced?: boolean
           error_message?: string | null
           sms_status?: 'sent' | 'failed' | null
+          device_info?: string | null
+          data_used_bytes?: number
+          expires_at?: string | null
           created_at?: string
           updated_at?: string
         }

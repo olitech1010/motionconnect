@@ -10,7 +10,7 @@ export class PaymentService {
     reference: string,
     description: string
   ): Promise<HubtelInitiateResponse> {
-    const isMock = process.env.MIKROTIK_MOCK === 'true' || process.env.HUBTEL_CLIENT_ID === 'demo_client_id'
+    const isMock = process.env.HUBTEL_MOCK === 'true' || process.env.HUBTEL_CLIENT_ID === 'demo_client_id' || process.env.HUBTEL_MERCHANT_ACCOUNT === 'demo_merchant_account'
 
     if (isMock) {
       console.log('--- [DEMO MODE] Initiating Hubtel Payment ---', { request, amount, reference })
@@ -37,24 +37,35 @@ export class PaymentService {
     const url = 'https://payproxyapi.hubtel.com/items/initiate'
 
     try {
+      const domain = process.env.NEXT_PUBLIC_PORTAL_DOMAIN || 'localhost:3000'
+      const protocol = domain.includes('localhost') ? 'http' : 'https'
+
+      const payload = {
+        totalAmount: amount,
+        description,
+        callbackUrl,
+        returnUrl: `${protocol}://${domain}/portal/status?ref=${reference}`,
+        merchantAccountNumber: merchantAccount,
+        clientReference: reference,
+      }
+
+      console.log('--- Initiating Hubtel Payment ---')
+      console.log('Payload:', payload)
+      console.log('Auth Prefix:', `Basic ${auth.substring(0, 5)}...`)
+
       const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Basic ${auth}`,
+          'Cache-Control': 'no-cache',
         },
-        body: JSON.stringify({
-          totalAmount: amount,
-          description,
-          callbackUrl,
-          returnUrl: `${process.env.NEXT_PUBLIC_PORTAL_DOMAIN}/portal/status?ref=${reference}`,
-          merchantAccountNumber: merchantAccount,
-          clientReference: reference,
-        }),
+        body: JSON.stringify(payload),
       })
 
       if (!response.ok) {
         const errText = await response.text()
+        console.error('Hubtel Error Response:', response.status, errText)
         return {
           reference,
           status: 'failed',

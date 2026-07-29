@@ -2,42 +2,54 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { Package, NewPackage, UpdatePackage } from '@/types/package'
 
+const DEFAULT_PACKAGES: Package[] = [
+  { id: '1', name: 'Weekly Access', slug: 'weekly', data_limit: '5GB', data_limit_bytes: 5368709120, duration_label: '7 Days Access', duration_seconds: 604800, amount: 11.00, mikrotik_profile: 'weekly', signal_bars: 1, is_active: true, sort_order: 1, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: '2', name: '24hr Speed Boost', slug: 'boost24', data_limit: '10GB', data_limit_bytes: 10737418240, duration_label: '24 Hours Access', duration_seconds: 86400, amount: 15.00, mikrotik_profile: 'boost24', signal_bars: 2, is_active: true, sort_order: 2, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: '3', name: 'Bi-Weekly Value', slug: 'biweekly', data_limit: '15GB', data_limit_bytes: 16106127360, duration_label: '14 Days Access', duration_seconds: 1209600, amount: 25.00, mikrotik_profile: 'biweekly', signal_bars: 3, is_active: true, sort_order: 3, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: '4', name: 'Bi-Weekly Pro', slug: 'bwpro', data_limit: '25GB', data_limit_bytes: 26843545600, duration_label: '14 Days Access', duration_seconds: 1209600, amount: 40.00, mikrotik_profile: 'bwpro', signal_bars: 4, is_active: true, sort_order: 4, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: '5', name: 'Monthly Unlimited', slug: 'monthly', data_limit: '50GB', data_limit_bytes: 53687091200, duration_label: '30 Days Access', duration_seconds: 2592000, amount: 70.00, mikrotik_profile: 'monthly', signal_bars: 5, is_active: true, sort_order: 5, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+]
+
 export class PackageService {
   /**
    * Fetch all active packages ordered by sort_order
    */
   static async getActivePackages(): Promise<Package[]> {
-    const supabase = await createClient()
-    const { data, error } = await supabase
-      .from('packages')
-      .select('*')
-      .eq('is_active', true)
-      .order('sort_order', { ascending: true })
+    try {
+      const supabase = await createClient()
+      const { data, error } = await supabase
+        .from('packages')
+        .select('*')
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true })
 
-    if (error) {
-      console.error('Error fetching active packages:', error.message)
-      throw new Error('Failed to fetch packages')
+      if (error || !data || data.length === 0) {
+        return DEFAULT_PACKAGES
+      }
+      return data
+    } catch {
+      return DEFAULT_PACKAGES
     }
-
-    return data || []
   }
 
   /**
    * Fetch all packages (for admin dashboard)
    */
   static async getAllPackages(): Promise<Package[]> {
-    const supabase = createAdminClient()
-    const { data, error } = await supabase
-      .from('packages')
-      .select('*')
-      .order('sort_order', { ascending: true })
+    try {
+      const supabase = createAdminClient()
+      const { data, error } = await supabase
+        .from('packages')
+        .select('*')
+        .order('sort_order', { ascending: true })
 
-    if (error) {
-      console.error('Error fetching all packages:', error.message)
-      throw new Error('Failed to fetch packages')
+      if (error || !data || data.length === 0) {
+        return DEFAULT_PACKAGES
+      }
+      return data
+    } catch {
+      return DEFAULT_PACKAGES
     }
-
-    return data || []
   }
 
   /**
