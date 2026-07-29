@@ -51,49 +51,49 @@ export function TransactionsTable({ initialTransactions }: TransactionsTableProp
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-zinc-200 shadow-sm">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-canvas p-6 rounded-lg border border-hairline shadow-sm">
         <div>
-          <h1 className="text-2xl font-black text-[#0D1B2A] tracking-tight">Transaction Ledger</h1>
-          <p className="text-sm text-zinc-500 mt-1">
+          <h1 className="text-2xl font-medium text-ink tracking-tight">Transaction Ledger</h1>
+          <p className="font-mono text-[12px] text-muted mt-1">
             Complete audit trail of all Mobile Money payments, Hubtel references, and voucher codes.
           </p>
         </div>
         <div className="flex items-center gap-2">
           <div className="relative">
-            <Search className="w-4 h-4 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-muted absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               placeholder="Search phone or ref..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 pr-4 py-2 text-xs font-semibold bg-zinc-50 border border-zinc-200 rounded-xl focus:outline-none focus:border-blue-500 transition-all w-full md:w-64"
+              className="pl-9 pr-4 py-2 font-mono text-[12px] bg-canvas border border-hairline rounded-md focus:outline-none focus:border-kumo-brand transition-all w-full md:w-64 text-ink placeholder:text-muted"
             />
           </div>
           <div className="relative">
             <button
               type="button"
               onClick={() => setIsFilterOpen(!isFilterOpen)}
-              className={`p-2 border rounded-xl transition-colors flex items-center gap-1 text-xs font-bold ${
+              className={`p-2 border rounded-md transition-colors flex items-center gap-1 font-mono text-[12px] font-bold ${
                 isFilterOpen || statusFilter !== 'all' || dateFilter !== 'all'
-                  ? 'bg-blue-50 border-blue-200 text-blue-700'
-                  : 'bg-zinc-50 border-zinc-200 text-zinc-600 hover:bg-zinc-100'
+                  ? 'bg-compute/10 border-compute text-compute'
+                  : 'bg-canvas border-hairline text-ink-soft hover:bg-hairline/30'
               }`}
             >
               <Filter className="w-4 h-4" />
               <span>Filter</span>
               {(statusFilter !== 'all' || dateFilter !== 'all') && (
-                <span className="w-2 h-2 rounded-full bg-blue-600 ml-1"></span>
+                <span className="w-2 h-2 rounded-full bg-compute ml-1"></span>
               )}
             </button>
 
             {isFilterOpen && (
-              <div className="absolute right-0 mt-2 w-56 bg-white border border-zinc-200 rounded-xl shadow-xl z-10 p-3 flex flex-col gap-4 animate-in fade-in slide-in-from-top-2">
+              <div className="absolute right-0 mt-2 w-56 bg-canvas border border-hairline rounded-lg shadow-xl z-10 p-3 flex flex-col gap-4 animate-in fade-in slide-in-from-top-2">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-extrabold uppercase tracking-wider text-zinc-500">Status</label>
+                  <label className="font-mono text-[10px] font-bold uppercase tracking-wider text-muted">Status</label>
                   <select 
                     value={statusFilter} 
                     onChange={(e) => setStatusFilter(e.target.value as FilterStatus)}
-                    className="w-full text-xs font-semibold bg-zinc-50 border border-zinc-200 rounded-lg p-2 focus:outline-none focus:border-blue-500 text-[#0D1B2A]"
+                    className="w-full font-mono text-[12px] bg-canvas border border-hairline rounded-md p-2 focus:outline-none focus:border-kumo-brand text-ink"
                   >
                     <option value="all">All Statuses</option>
                     <option value="success">Success</option>
@@ -102,11 +102,11 @@ export function TransactionsTable({ initialTransactions }: TransactionsTableProp
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-extrabold uppercase tracking-wider text-zinc-500">Date Range</label>
+                  <label className="font-mono text-[10px] font-bold uppercase tracking-wider text-muted">Date Range</label>
                   <select 
                     value={dateFilter} 
                     onChange={(e) => setDateFilter(e.target.value as FilterDate)}
-                    className="w-full text-xs font-semibold bg-zinc-50 border border-zinc-200 rounded-lg p-2 focus:outline-none focus:border-blue-500 text-[#0D1B2A]"
+                    className="w-full font-mono text-[12px] bg-canvas border border-hairline rounded-md p-2 focus:outline-none focus:border-kumo-brand text-ink"
                   >
                     <option value="all">All Time</option>
                     <option value="today">Today</option>
@@ -120,25 +120,27 @@ export function TransactionsTable({ initialTransactions }: TransactionsTableProp
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-zinc-200 shadow-sm overflow-hidden">
+      <div className="bg-canvas rounded-lg border border-hairline shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-zinc-50 border-b border-zinc-200 text-[11px] font-extrabold uppercase tracking-wider text-zinc-500">
+              <tr className="bg-hairline/30 border-b border-hairline font-mono text-[10px] font-bold uppercase tracking-wider text-muted">
                 <th className="py-3.5 px-6">Reference</th>
                 <th className="py-3.5 px-6">Phone Number</th>
+                <th className="py-3.5 px-6">Device & Telemetry</th>
                 <th className="py-3.5 px-6">Package</th>
                 <th className="py-3.5 px-6">Amount</th>
                 <th className="py-3.5 px-6">Voucher Code</th>
                 <th className="py-3.5 px-6">Hubtel Ref</th>
                 <th className="py-3.5 px-6">Status</th>
+                <th className="py-3.5 px-6">Expiration</th>
                 <th className="py-3.5 px-6">Timestamp</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-100 text-sm font-medium text-[#0D1B2A]">
+            <tbody className="divide-y divide-hairline text-sm font-medium text-ink">
               {filteredTransactions.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="py-16 text-center text-zinc-400">
+                  <td colSpan={8} className="py-16 text-center text-muted font-mono text-[12px]">
                     {initialTransactions.length === 0 
                       ? 'No transaction history found in database.' 
                       : 'No transactions match your search/filter criteria.'}
@@ -151,33 +153,41 @@ export function TransactionsTable({ initialTransactions }: TransactionsTableProp
                   const txDate = new Date(txn.created_at)
 
                   return (
-                    <tr key={txn.id} className="hover:bg-zinc-50/80 transition-colors">
-                      <td className="py-3.5 px-6 font-mono text-xs font-bold text-[#1466B8]">
+                    <tr key={txn.id} className="hover:bg-hairline/30 transition-colors">
+                      <td className="py-3.5 px-6 font-mono text-[12px] font-bold text-kumo-brand">
                         {txn.reference}
                       </td>
                       <td className="py-3.5 px-6 font-bold">{txn.phone}</td>
-                      <td className="py-3.5 px-6 text-zinc-600">{txn.package_name}</td>
-                      <td className="py-3.5 px-6 font-extrabold">GHS {txn.amount.toFixed(2)}</td>
-                      <td className="py-3.5 px-6 font-mono text-xs">
+                      <td className="py-3.5 px-6">
+                        <div className="font-mono text-[12px] font-bold text-ink truncate max-w-[180px]" title={txn.device_info || 'Unknown Device'}>
+                          {txn.device_info || 'Unknown Device'}
+                        </div>
+                        <div className="text-[10px] text-muted font-mono mt-0.5">
+                          MAC: {txn.mac_address || 'N/A'}
+                        </div>
+                      </td>
+                      <td className="py-3.5 px-6 text-ink-soft">{txn.package_name}</td>
+                      <td className="py-3.5 px-6 font-bold">GHS {txn.amount.toFixed(2)}</td>
+                      <td className="py-3.5 px-6 font-mono text-[12px]">
                         {txn.voucher_code ? (
-                          <span className="bg-blue-50 text-blue-700 px-2 py-1 rounded font-bold">
+                          <span className="bg-compute/10 text-compute px-2 py-1 rounded-md font-bold">
                             {txn.voucher_code}
                           </span>
                         ) : (
-                          <span className="text-zinc-400">—</span>
+                          <span className="text-muted">—</span>
                         )}
                       </td>
-                      <td className="py-3.5 px-6 font-mono text-xs text-zinc-500">
+                      <td className="py-3.5 px-6 font-mono text-[12px] text-muted">
                         {txn.hubtel_reference || '—'}
                       </td>
                       <td className="py-3.5 px-6">
                         <span
-                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold ${
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full font-mono text-[11px] font-bold ${
                             isSuccess
-                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                              ? 'bg-ai/10 text-ai border border-ai/20'
                               : isPending
-                              ? 'bg-amber-50 text-amber-700 border border-amber-200 animate-pulse'
-                              : 'bg-rose-50 text-rose-700 border border-rose-200'
+                              ? 'bg-kumo-brand-soft/10 text-kumo-brand-soft border border-kumo-brand-soft/20 animate-pulse'
+                              : 'bg-emergency-red/10 text-emergency-red border border-emergency-red/20'
                           }`}
                         >
                           {isSuccess ? (
@@ -190,9 +200,12 @@ export function TransactionsTable({ initialTransactions }: TransactionsTableProp
                           <span className="capitalize">{txn.status}</span>
                         </span>
                       </td>
-                      <td className="py-3.5 px-6 text-xs text-zinc-400 whitespace-nowrap">
-                        <div className="font-semibold text-zinc-600">{txDate.toLocaleDateString()}</div>
-                        <div className="text-[11px] mt-0.5">{txDate.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}</div>
+                      <td className="py-3.5 px-6 font-mono text-[12px] text-muted">
+                        {txn.expires_at ? new Date(txn.expires_at).toLocaleString() : '—'}
+                      </td>
+                      <td className="py-3.5 px-6 font-mono text-[12px] text-muted whitespace-nowrap">
+                        <div className="font-bold text-ink-soft">{txDate.toLocaleDateString()}</div>
+                        <div className="mt-0.5">{txDate.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}</div>
                       </td>
                     </tr>
                   )
