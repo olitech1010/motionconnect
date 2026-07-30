@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { Package } from '@/types/package'
 import { ShieldAlert, CheckCircle2, Lock, Zap, Award, Smartphone, MessageCircle, ArrowRight, Copy, Check } from 'lucide-react'
 
@@ -61,26 +61,23 @@ export function CaptivePortal({ initialPackages, mikrotikParams, returnReference
     return /CaptiveNetwork|AppleWebKit.*Mobile.*|Dalvik.*|CaptivePortal/i.test(ua) && !/Safari/i.test(ua)
   })
 
-  // Restore or Save mikrotikParams
-  const [persistedParams, setPersistedParams] = useState(mikrotikParams)
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-    const stored = sessionStorage.getItem('motion_mikrotik_params')
-    
-    // If we have fresh params from URL that contain a MAC, save them
-    if (mikrotikParams?.mac) {
-      sessionStorage.setItem('motion_mikrotik_params', JSON.stringify(mikrotikParams))
-      setPersistedParams(mikrotikParams)
-    } 
-    // Otherwise, if we came back from a redirect and have no MAC, try to restore
-    else if (stored) {
-      try {
-        setPersistedParams(JSON.parse(stored))
-      } catch (e) {
-        // ignore JSON parse error
+  // Resolve persisted MikroTik params: URL params take priority, then sessionStorage
+  const persistedParams = useMemo(() => {
+    if (mikrotikParams?.mac) return mikrotikParams
+    if (typeof window !== 'undefined') {
+      const stored = sessionStorage.getItem('motion_mikrotik_params')
+      if (stored) {
+        try { return JSON.parse(stored) } catch { /* ignore */ }
       }
     }
+    return mikrotikParams
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mikrotikParams?.mac, mikrotikParams?.ip, mikrotikParams?.loginUrl])
+
+  // Side-effect only: write fresh URL params to sessionStorage for post-redirect recovery
+  useEffect(() => {
+    if (typeof window === 'undefined' || !mikrotikParams?.mac) return
+    sessionStorage.setItem('motion_mikrotik_params', JSON.stringify(mikrotikParams))
   }, [mikrotikParams])
 
   // Existing MikroTik login form state
@@ -112,17 +109,6 @@ export function CaptivePortal({ initialPackages, mikrotikParams, returnReference
     }, 1000)
     return () => clearInterval(timer)
   }, [activeTab])
-
-  // If user returned from Hubtel checkout, start polling automatically
-  useEffect(() => {
-    if (returnReference) {
-      setOvTitle('Checking payment status…')
-      setOvMsg('Please wait while we confirm your payment.')
-      setIsProcessing(true)
-      startPolling(returnReference, Date.now())
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [returnReference])
 
   // Poll payment status from /api/payments/status
   const startPolling = useCallback((reference: string, startTime: number) => {
@@ -158,6 +144,18 @@ export function CaptivePortal({ initialPackages, mikrotikParams, returnReference
 
     setTimeout(() => checkStatus(), 3000)
   }, [])
+
+  // If user returned from Hubtel checkout, start polling automatically
+  useEffect(() => {
+    if (!returnReference) return
+    setTimeout(() => {
+      setOvTitle('Checking payment status…')
+      setOvMsg('Please wait while we confirm your payment.')
+      setIsProcessing(true)
+      startPolling(returnReference, Date.now())
+    }, 0)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [returnReference])
 
   // Check URL params for returning from checkout
   useEffect(() => {

@@ -9,14 +9,19 @@ export async function POST(request: Request) {
   try {
     const rawBody = await request.text()
     const signature = request.headers.get('x-hubtel-signature') || request.headers.get('authorization')
-    const secret = process.env.HUBTEL_CLIENT_SECRET || ''
 
-    // Optional HMAC verification if secret is configured and signature present
-    if (signature && secret) {
-      const computed = crypto.createHmac('sha256', secret).update(rawBody).digest('hex')
+    // Strict HMAC verification: reject forged requests
+    const webhookSecret = process.env.HUBTEL_CLIENT_SECRET || ''
+    if (signature && webhookSecret) {
+      const computed = crypto.createHmac('sha256', webhookSecret).update(rawBody).digest('hex')
       if (computed !== signature && !signature.includes(computed)) {
-        console.warn('Webhook signature mismatch. Proceeding with caution or rejecting.')
+        console.error('Webhook signature verification FAILED. Rejecting request.')
+        return NextResponse.json({ error: 'Invalid webhook signature' }, { status: 401 })
       }
+    } else if (!signature) {
+      // Hubtel may not always send a signature — log but allow for now
+      // TODO: enforce strict mode once Hubtel signature confirmed in production
+      console.warn('Webhook received without signature header. Proceeding without verification.')
     }
 
     const payload = JSON.parse(rawBody)
@@ -44,7 +49,8 @@ export async function POST(request: Request) {
       const durationSec = pkg?.duration_seconds || 86400
       const expiresAt = new Date(Date.now() + durationSec * 1000).toISOString()
 
-      const voucher = `MC-${Math.random().toString(36).substring(2, 8).toUpperCase()}`
+      // Generate cryptographically secure voucher code
+      const voucher = `MC-${crypto.randomBytes(4).toString('hex').toUpperCase()}`
       const username = voucher.toLowerCase()
 
       // Create Hotspot User on MikroTik
@@ -87,6 +93,9 @@ export async function POST(request: Request) {
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : 'Error processing webhook'
     console.error('Webhook Error:', msg)
-    return NextResponse.json({ error: msg }, { status: 500 })
+    return NextResponse.json(
+      { error: 'Internal server error processing webhook' },
+      { status: 500 }
+    )
   }
 }

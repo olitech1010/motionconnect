@@ -65,8 +65,10 @@ export class PaymentService {
       }
 
       console.log('--- Initiating Hubtel Payment ---')
-      console.log('Payload:', rawPayload)
-      console.log('Auth Header:', `Basic ${auth.substring(0, 8)}...`)
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('Payload:', rawPayload)
+        console.log('Auth Header:', `Basic ${auth.substring(0, 8)}...`)
+      }
 
       const response = await fetch('https://payproxyapi.hubtel.com/items/initiate', requestOptions)
 
@@ -93,17 +95,18 @@ export class PaymentService {
         }
       }
 
-      let data: Record<string, any> = {}
+      let data: Record<string, unknown> = {}
       try {
         data = rawText ? JSON.parse(rawText) : {}
       } catch {
         console.error('Failed to parse Hubtel JSON response')
       }
 
+      const dataObj = data as { data?: { checkoutUrl?: string }; checkoutUrl?: string }
       return {
         reference,
         status: 'pending',
-        checkoutUrl: data.data?.checkoutUrl || data.checkoutUrl,
+        checkoutUrl: dataObj.data?.checkoutUrl || dataObj.checkoutUrl,
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Unknown Hubtel error'
