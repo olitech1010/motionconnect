@@ -35,5 +35,7 @@ export default async function HomePage({ searchParams }: PageProps) {
     ip: getParamStr(resolvedParams['ip']) || getParamStr(resolvedParams['client_ip']),
   }
 
-  return <CaptivePortal initialPackages={packages} mikrotikParams={mikrotikParams} />
+  const returnReference = getParamStr(resolvedParams['reference'])
+
+  return <CaptivePortal initialPackages={packages} mikrotikParams={mikrotikParams} returnReference={returnReference} />
 }

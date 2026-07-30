@@ -50,7 +50,7 @@ export class PaymentService {
         totalAmount: amount,
         description: description,
         callbackUrl: callbackUrl || defaultCallback,
-        returnUrl: `${protocol}://${domain}/portal/status?reference=${reference}`,
+        returnUrl: `${protocol}://${domain}/?reference=${reference}`,
         merchantAccountNumber: merchantAccount,
         cancellationUrl: `${protocol}://${domain}/portal#cancelled`,
         clientReference: reference,

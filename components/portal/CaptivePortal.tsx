@@ -14,6 +14,7 @@ interface CaptivePortalProps {
     mac?: string
     ip?: string
   }
+  returnReference?: string
 }
 
 const PROMOS = [
@@ -24,7 +25,7 @@ const PROMOS = [
   { icon: <MessageCircle className="w-4 h-4 text-cream" />, head: 'Need Help?', sub: 'Chat our support team on WhatsApp anytime.' },
 ]
 
-export function CaptivePortal({ initialPackages, mikrotikParams }: CaptivePortalProps) {
+export function CaptivePortal({ initialPackages, mikrotikParams, returnReference }: CaptivePortalProps) {
   const [activeTab, setActiveTab] = useState<'buy' | 'login' | 'creds'>('buy')
   const [selectedPkgId, setSelectedPkgId] = useState<string | null>(
     initialPackages.length > 0 ? initialPackages[0].id : null
@@ -112,6 +113,17 @@ export function CaptivePortal({ initialPackages, mikrotikParams }: CaptivePortal
     }, 1000)
     return () => clearInterval(timer)
   }, [activeTab])
+
+  // If user returned from Hubtel checkout, start polling automatically
+  useEffect(() => {
+    if (returnReference) {
+      setOvTitle('Checking payment status…')
+      setOvMsg('Please wait while we confirm your payment.')
+      setIsProcessing(true)
+      startPolling(returnReference, Date.now())
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [returnReference])
 
   // Poll payment status from /api/payments/status
   const startPolling = useCallback((reference: string, startTime: number) => {
@@ -207,7 +219,13 @@ export function CaptivePortal({ initialPackages, mikrotikParams }: CaptivePortal
 
       if (data.checkoutUrl) {
         setCheckoutUrl(data.checkoutUrl)
+        setOvTitle('Redirecting to Hubtel…')
+        setOvMsg('Please wait, redirecting to secure payment page.')
+        window.location.href = data.checkoutUrl
+        return
       }
+      
+      // Fallback if no checkoutUrl but still successful (e.g., Direct Receive Money)
       setOvTitle('Waiting for MoMo approval…')
       setOvMsg(`Prompt sent to ${cleanPhone}. Please enter your PIN to authorize payment.`)
       startPolling(data.reference, Date.now())
@@ -609,7 +627,7 @@ export function CaptivePortal({ initialPackages, mikrotikParams }: CaptivePortal
                 href={checkoutUrl}
                 className="inline-flex items-center justify-center gap-1.5 w-full py-3 px-4 rounded-full bg-ink text-cream font-medium text-[15px] shadow-none hover:brightness-110 transition-all cursor-pointer mt-2"
               >
-                <span>🔗 Open MoMo Checkout Simulator</span>
+                <span>🔗 Complete Payment on Hubtel</span>
               </a>
             )}
           </div>
