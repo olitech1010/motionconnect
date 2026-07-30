@@ -38,7 +38,7 @@ export class PaymentService {
     const auth = authToken || Buffer.from(`${clientId}:${clientSecret}`).toString('base64')
 
     try {
-      const domain = process.env.NEXT_PUBLIC_PORTAL_DOMAIN || 'localhost:3000'
+      const domain = process.env.NEXT_PUBLIC_PORTAL_DOMAIN || process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.VERCEL_URL || 'localhost:3000'
       const protocol = domain.includes('localhost') ? 'http' : 'https'
       const defaultCallback = `${protocol}://${domain}/api/payments/webhook`
 

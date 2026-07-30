@@ -7,7 +7,7 @@ import { PaymentService } from '@/services/payment.service'
 const InitiateSchema = z.object({
   packageId: z.string().min(1, 'Package ID is required'),
   amount: z.number().positive('Amount must be positive'),
-  phone: z.string().min(9, 'Phone number must be at least 9 digits'),
+  phone: z.string().optional(),
   name: z.string().optional(),
   macAddress: z.string().optional(),
   ipAddress: z.string().optional(),
@@ -26,7 +26,7 @@ export async function POST(request: Request) {
     }
 
     const { packageId, phone, name, macAddress, ipAddress } = validation.data
-    const cleanPhone = phone.replace(/\D/g, '')
+    const cleanPhone = phone ? phone.replace(/\D/g, '') : '0000000000'
     const userAgent = request.headers.get('user-agent') || 'Unknown Device'
     const forwardedIp = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || ipAddress || 'Unknown IP'
     const mac = macAddress || '00:00:00:00:00:00'

@@ -30,7 +30,6 @@ export function CaptivePortal({ initialPackages, mikrotikParams, returnReference
   const [selectedPkgId, setSelectedPkgId] = useState<string | null>(
     initialPackages.length > 0 ? initialPackages[0].id : null
   )
-  const [phone, setPhone] = useState('')
   const [name, setName] = useState('')
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   
@@ -178,14 +177,9 @@ export function CaptivePortal({ initialPackages, mikrotikParams, returnReference
 
   const handleStartPayment = async () => {
     setErrorMsg(null)
-    const cleanPhone = phone.replace(/\D/g, '')
 
     if (!selectedPkgId) {
       setErrorMsg('Please select a Wi-Fi package.')
-      return
-    }
-    if (cleanPhone.length < 9) {
-      setErrorMsg('Please enter a valid 9 or 10-digit Mobile Money number.')
       return
     }
 
@@ -193,8 +187,8 @@ export function CaptivePortal({ initialPackages, mikrotikParams, returnReference
     if (!selectedPkg) return
 
     setIsProcessing(true)
-    setOvTitle('Sending payment prompt…')
-    setOvMsg(`Approve GHS ${selectedPkg.amount.toFixed(2)} on ${cleanPhone} to continue.`)
+    setOvTitle('Connecting to secure checkout…')
+    setOvMsg(`Preparing GHS ${selectedPkg.amount.toFixed(2)} payment gateway.`)
 
     try {
       const res = await fetch('/api/payments/initiate', {
@@ -203,7 +197,6 @@ export function CaptivePortal({ initialPackages, mikrotikParams, returnReference
         body: JSON.stringify({
           packageId: selectedPkg.id,
           amount: selectedPkg.amount,
-          phone: cleanPhone,
           name: name.trim() || 'Motion Connect User',
           macAddress: persistedParams?.mac,
           ipAddress: persistedParams?.ip,
@@ -227,7 +220,7 @@ export function CaptivePortal({ initialPackages, mikrotikParams, returnReference
       
       // Fallback if no checkoutUrl but still successful (e.g., Direct Receive Money)
       setOvTitle('Waiting for MoMo approval…')
-      setOvMsg(`Prompt sent to ${cleanPhone}. Please enter your PIN to authorize payment.`)
+      setOvMsg(`Please follow the prompts on your phone to authorize payment.`)
       startPolling(data.reference, Date.now())
     } catch (err: unknown) {
       setIsProcessing(false)
@@ -410,26 +403,7 @@ export function CaptivePortal({ initialPackages, mikrotikParams, returnReference
               />
             </div>
 
-            {/* MoMo Number Field */}
-            <div className="mt-4">
-              <label htmlFor="phone" className="block font-mono text-[12px] text-ink-soft mb-1.5 tracking-wide">
-                Mobile Money number
-              </label>
-              <input
-                id="phone"
-                type="tel"
-                inputMode="numeric"
-                autoComplete="tel"
-                placeholder="e.g. 024 000 0000"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                maxLength={15}
-                className="w-full font-sans text-[16px] text-ink bg-canvas border border-kumo-brand/30 rounded-md py-3 px-3.5 focus:outline-none focus:border-kumo-brand focus:ring-1 focus:ring-kumo-brand transition-all placeholder:text-muted/60"
-              />
-              <p className="font-mono text-[11.5px] text-muted mt-1.5">
-                You&apos;ll receive a prompt on this number to approve payment.
-              </p>
-            </div>
+
 
             {/* Error Message Banner */}
             {errorMsg && (
@@ -443,7 +417,7 @@ export function CaptivePortal({ initialPackages, mikrotikParams, returnReference
             <button
               type="button"
               onClick={handleStartPayment}
-              disabled={!selectedPkgId || phone.replace(/\D/g, '').length < 9 || isProcessing}
+              disabled={!selectedPkgId || isProcessing}
               className="w-full mt-4 font-medium text-[15px] bg-kumo-brand text-cream rounded-full py-3.5 px-4 flex items-center justify-center gap-2 cursor-pointer shadow-none hover:bg-kumo-brand-hover transition-all disabled:opacity-55 disabled:cursor-not-allowed disabled:hover:bg-kumo-brand"
             >
               <Lock className="w-4 h-4" />

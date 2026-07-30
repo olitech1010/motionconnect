@@ -55,6 +55,8 @@ export async function POST(request: Request) {
         comment: `Txn Ref: ${reference} | Hubtel Webhook`,
       })
 
+      const phoneFromWebhook = payload.CustomerPhoneNumber || payload.customerPhoneNumber || undefined
+
       // Update Database
       await TransactionService.updateTransaction(reference, {
         status: 'success',
@@ -64,6 +66,7 @@ export async function POST(request: Request) {
         mikrotik_synced: true,
         sms_status: 'sent',
         expires_at: expiresAt,
+        ...(phoneFromWebhook && { phone: phoneFromWebhook }),
       })
 
       // Log in activity logs
