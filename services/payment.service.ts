@@ -28,52 +28,77 @@ export class PaymentService {
     const clientSecret = process.env.HUBTEL_CLIENT_SECRET
     const merchantAccount = process.env.HUBTEL_MERCHANT_ACCOUNT
     const callbackUrl = process.env.HUBTEL_CALLBACK_URL
+    const authToken = process.env.HUBTEL_AUTH_TOKEN
 
-    if (!clientId || !clientSecret || !merchantAccount) {
+    if ((!authToken && (!clientId || !clientSecret)) || !merchantAccount) {
       throw new Error('Hubtel API credentials missing from environment')
     }
 
-    const auth = Buffer.from(`${clientId}:${clientSecret}`).toString('base64')
-    const url = 'https://payproxyapi.hubtel.com/items/initiate'
+    // Use pre-encoded token from env directly if available, avoiding runtime encoding
+    const auth = authToken || Buffer.from(`${clientId}:${clientSecret}`).toString('base64')
 
     try {
       const domain = process.env.NEXT_PUBLIC_PORTAL_DOMAIN || 'localhost:3000'
       const protocol = domain.includes('localhost') ? 'http' : 'https'
+      const defaultCallback = `${protocol}://${domain}/api/payments/webhook`
 
-      const payload = {
+      const myHeaders = new Headers()
+      myHeaders.append("Authorization", `Basic ${auth}`)
+      myHeaders.append("Content-Type", "application/json")
+
+      const rawPayload = JSON.stringify({
         totalAmount: amount,
-        description,
-        callbackUrl,
-        returnUrl: `${protocol}://${domain}/portal/status?ref=${reference}`,
+        description: description,
+        callbackUrl: callbackUrl || defaultCallback,
+        returnUrl: `${protocol}://${domain}/portal/status?reference=${reference}`,
         merchantAccountNumber: merchantAccount,
+        cancellationUrl: `${protocol}://${domain}/portal#cancelled`,
         clientReference: reference,
+      })
+
+      const requestOptions: RequestInit = {
+        method: "POST",
+        headers: myHeaders,
+        body: rawPayload,
+        redirect: "follow",
       }
 
       console.log('--- Initiating Hubtel Payment ---')
-      console.log('Payload:', payload)
-      console.log('Auth Prefix:', `Basic ${auth.substring(0, 5)}...`)
+      console.log('Payload:', rawPayload)
+      console.log('Auth Header:', `Basic ${auth.substring(0, 8)}...`)
 
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Basic ${auth}`,
-          'Cache-Control': 'no-cache',
-        },
-        body: JSON.stringify(payload),
+      const response = await fetch('https://payproxyapi.hubtel.com/items/initiate', requestOptions)
+
+      // Convert response headers to a plain object for logging
+      const responseHeaders: Record<string, string> = {}
+      response.headers.forEach((value, key) => {
+        responseHeaders[key] = value
       })
 
+      const rawText = await response.text()
+
+      console.log('=== [HUBTEL RESPONSE LOG] ===')
+      console.log('Status Code:', response.status, response.statusText)
+      console.log('Headers:', JSON.stringify(responseHeaders, null, 2))
+      console.log('Raw Body:', rawText || '<EMPTY BODY>')
+      console.log('=============================')
+
       if (!response.ok) {
-        const errText = await response.text()
-        console.error('Hubtel Error Response:', response.status, errText)
+        console.error('Hubtel Error Response:', response.status, rawText)
         return {
           reference,
           status: 'failed',
-          message: `Hubtel Error (${response.status}): ${errText}`,
+          message: `Hubtel Error (${response.status}): ${rawText}`,
         }
       }
 
-      const data = await response.json()
+      let data: Record<string, any> = {}
+      try {
+        data = rawText ? JSON.parse(rawText) : {}
+      } catch {
+        console.error('Failed to parse Hubtel JSON response')
+      }
+
       return {
         reference,
         status: 'pending',
