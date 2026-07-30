@@ -30,6 +30,7 @@ export function CaptivePortal({ initialPackages, mikrotikParams }: CaptivePortal
     initialPackages.length > 0 ? initialPackages[0].id : null
   )
   const [phone, setPhone] = useState('')
+  const [name, setName] = useState('')
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   
   // Overlay & Polling State
@@ -191,6 +192,7 @@ export function CaptivePortal({ initialPackages, mikrotikParams }: CaptivePortal
           packageId: selectedPkg.id,
           amount: selectedPkg.amount,
           phone: cleanPhone,
+          name: name.trim() || 'Motion Connect User',
           macAddress: persistedParams?.mac,
           ipAddress: persistedParams?.ip,
         }),

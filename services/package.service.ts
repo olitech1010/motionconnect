@@ -2,12 +2,12 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { Package, NewPackage, UpdatePackage } from '@/types/package'
 
-const DEFAULT_PACKAGES: Package[] = [
-  { id: '1', name: 'Weekly Access', slug: 'weekly', data_limit: '5GB', data_limit_bytes: 5368709120, duration_label: '7 Days Access', duration_seconds: 604800, amount: 11.00, mikrotik_profile: 'weekly', signal_bars: 1, is_active: true, sort_order: 1, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-  { id: '2', name: '24hr Speed Boost', slug: 'boost24', data_limit: '10GB', data_limit_bytes: 10737418240, duration_label: '24 Hours Access', duration_seconds: 86400, amount: 15.00, mikrotik_profile: 'boost24', signal_bars: 2, is_active: true, sort_order: 2, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-  { id: '3', name: 'Bi-Weekly Value', slug: 'biweekly', data_limit: '15GB', data_limit_bytes: 16106127360, duration_label: '14 Days Access', duration_seconds: 1209600, amount: 25.00, mikrotik_profile: 'biweekly', signal_bars: 3, is_active: true, sort_order: 3, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-  { id: '4', name: 'Bi-Weekly Pro', slug: 'bwpro', data_limit: '25GB', data_limit_bytes: 26843545600, duration_label: '14 Days Access', duration_seconds: 1209600, amount: 40.00, mikrotik_profile: 'bwpro', signal_bars: 4, is_active: true, sort_order: 4, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-  { id: '5', name: 'Monthly Unlimited', slug: 'monthly', data_limit: '50GB', data_limit_bytes: 53687091200, duration_label: '30 Days Access', duration_seconds: 2592000, amount: 70.00, mikrotik_profile: 'monthly', signal_bars: 5, is_active: true, sort_order: 5, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+export const DEFAULT_PACKAGES: Package[] = [
+  { id: '11111111-1111-1111-1111-111111111111', name: 'Weekly Access', slug: 'weekly', data_limit: '5GB', data_limit_bytes: 5368709120, duration_label: '7 Days Access', duration_seconds: 604800, amount: 11.00, mikrotik_profile: 'weekly', signal_bars: 1, is_active: true, sort_order: 1, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: '22222222-2222-2222-2222-222222222222', name: '24hr Speed Boost', slug: 'boost24', data_limit: '10GB', data_limit_bytes: 10737418240, duration_label: '24 Hours Access', duration_seconds: 86400, amount: 15.00, mikrotik_profile: 'boost24', signal_bars: 2, is_active: true, sort_order: 2, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: '33333333-3333-3333-3333-333333333333', name: 'Bi-Weekly Value', slug: 'biweekly', data_limit: '15GB', data_limit_bytes: 16106127360, duration_label: '14 Days Access', duration_seconds: 1209600, amount: 25.00, mikrotik_profile: 'biweekly', signal_bars: 3, is_active: true, sort_order: 3, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: '44444444-4444-4444-4444-444444444444', name: 'Bi-Weekly Pro', slug: 'bwpro', data_limit: '25GB', data_limit_bytes: 26843545600, duration_label: '14 Days Access', duration_seconds: 1209600, amount: 40.00, mikrotik_profile: 'bwpro', signal_bars: 4, is_active: true, sort_order: 4, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: '55555555-5555-5555-5555-555555555555', name: 'Monthly Unlimited', slug: 'monthly', data_limit: '50GB', data_limit_bytes: 53687091200, duration_label: '30 Days Access', duration_seconds: 2592000, amount: 70.00, mikrotik_profile: 'monthly', signal_bars: 5, is_active: true, sort_order: 5, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
 ]
 
 export class PackageService {
@@ -63,8 +63,9 @@ export class PackageService {
       .eq('id', id)
       .single()
 
-    if (error) {
-      return null
+    if (error || !data) {
+      // Fallback to DEFAULT_PACKAGES if DB fails (e.g. invalid UUID format or missing)
+      return DEFAULT_PACKAGES.find(p => p.id === id) || null
     }
 
     return data

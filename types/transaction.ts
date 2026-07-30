@@ -5,3 +5,5 @@ export type NewTransaction = Database['public']['Tables']['transactions']['Inser
 export type UpdateTransaction = Database['public']['Tables']['transactions']['Update']
 
 export type TransactionStatus = Transaction['status']
+
+export type ActivityLog = Database['public']['Tables']['activity_logs']['Row']

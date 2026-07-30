@@ -1,6 +1,7 @@
 export interface HubtelInitiateRequest {
   packageId: string
   phone: string
+  name?: string
   macAddress: string
   ipAddress?: string
   linkLogin?: string

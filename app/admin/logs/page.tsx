@@ -5,20 +5,13 @@ import { LogsTable } from '@/components/admin/LogsTable'
 
 export const revalidate = 0
 
-interface ActivityLog {
-  id: string
-  action: string
-  details?: unknown
-  ip_address?: string
-  created_at: string
-  actor?: string
-}
+import { ActivityLog } from '@/types/transaction'
 
 const DEFAULT_LOGS: ActivityLog[] = [
-  { id: 'log-1', action: 'SYSTEM_STARTUP', details: { service: 'MikroTik API Gateway', status: 'ready', os: 'v7.19.6' }, ip_address: '192.168.20.1', created_at: new Date(Date.now() - 300000).toISOString() },
-  { id: 'log-2', action: 'HOTSPOT_USER_CREATED', details: { username: 'MC-2481', profile: 'weekly', router: 'Main Campus Router' }, ip_address: '10.0.0.12', created_at: new Date(Date.now() - 1200000).toISOString() },
-  { id: 'log-3', action: 'WEBHOOK_RECEIVED', details: { provider: 'Hubtel', reference: 'MC-78901234', amount: 11.0 }, ip_address: '154.160.1.20', created_at: new Date(Date.now() - 1250000).toISOString() },
-  { id: 'log-4', action: 'ADMIN_LOGIN', details: { email: 'admin@motionconect.com', role: 'superadmin' }, ip_address: '127.0.0.1', created_at: new Date(Date.now() - 3600000).toISOString() },
+  { id: 'log-1', action: 'SYSTEM_STARTUP', actor: 'system', details: { service: 'MikroTik API Gateway', status: 'ready', os: 'v7.19.6' }, created_at: new Date(Date.now() - 300000).toISOString() },
+  { id: 'log-2', action: 'HOTSPOT_USER_CREATED', actor: 'system', details: { username: 'MC-2481', profile: 'weekly', router: 'Main Campus Router' }, created_at: new Date(Date.now() - 1200000).toISOString() },
+  { id: 'log-3', action: 'WEBHOOK_RECEIVED', actor: 'system', details: { provider: 'Hubtel', reference: 'MC-78901234', amount: 11.0 }, created_at: new Date(Date.now() - 1250000).toISOString() },
+  { id: 'log-4', action: 'ADMIN_LOGIN', actor: 'admin@motionconect.com', details: { email: 'admin@motionconect.com', role: 'superadmin' }, created_at: new Date(Date.now() - 3600000).toISOString() },
 ]
 
 export default async function AdminLogsPage() {

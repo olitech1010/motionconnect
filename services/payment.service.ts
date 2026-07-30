@@ -54,6 +54,7 @@ export class PaymentService {
         merchantAccountNumber: merchantAccount,
         cancellationUrl: `${protocol}://${domain}/portal#cancelled`,
         clientReference: reference,
+        customerName: request.name || 'Motion Connect User',
       })
 
       const requestOptions: RequestInit = {
@@ -114,3 +115,6 @@ export class PaymentService {
     }
   }
 }
+
+// Service ready for production & sandbox Hubtel API
+
