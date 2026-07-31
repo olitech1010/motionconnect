@@ -158,15 +158,17 @@ export class PaymentService {
     const auth = authToken || Buffer.from(`${clientId}:${clientSecret}`).toString('base64')
 
     try {
-      // Hubtel Transaction Status Check API
+      // Hubtel Transaction Status Check API (PayProxy POST endpoint)
       const res = await fetch(
-        `https://payproxyapi.hubtel.com/items/initiate/status/${reference}`,
+        `https://payproxyapi.hubtel.com/transaction/status`,
         {
-          method: 'GET',
+          method: 'POST',
           headers: {
             'Authorization': `Basic ${auth}`,
             'Content-Type': 'application/json',
+            'Accept': 'application/json',
           },
+          body: JSON.stringify({ ClientReference: reference }),
         }
       )
 
@@ -175,19 +177,27 @@ export class PaymentService {
         return { paid: false }
       }
 
-      const data = await res.json() as Record<string, unknown>
+      interface HubtelStatusResponse {
+        ResponseCode?: string
+        Status?: string
+        Data?: {
+          TransactionId?: string
+          CustomerPhoneNumber?: string
+        }
+      }
+
+      const data = await res.json() as HubtelStatusResponse
       console.log('Hubtel status check response:', JSON.stringify(data))
 
       // Check various Hubtel response formats for success
-      const responseCode = (data as { ResponseCode?: string }).ResponseCode
-      const status = ((data as { Status?: string }).Status || '').toLowerCase()
-      const dataObj = data as { Data?: { TransactionId?: string; CustomerPhoneNumber?: string } }
-
-      if (responseCode === '0000' || status === 'success' || status === 'paid') {
+      const responseCode = data.ResponseCode
+      const status = (data.Status || '').toLowerCase()
+      
+      if (responseCode === '0000' || responseCode === '00' || status === 'completed' || status === 'success' || status === 'paid') {
         return {
           paid: true,
-          transactionId: dataObj.Data?.TransactionId || 'HUBTEL_STATUS_CHECK',
-          phone: dataObj.Data?.CustomerPhoneNumber,
+          transactionId: data.Data?.TransactionId || 'HUBTEL_STATUS_CHECK',
+          phone: data.Data?.CustomerPhoneNumber,
         }
       }
 

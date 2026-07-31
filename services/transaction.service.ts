@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+// Removed createClient import
 import { createAdminClient } from '@/lib/supabase/admin'
 import { Transaction, NewTransaction, UpdateTransaction } from '@/types/transaction'
 
@@ -36,7 +36,7 @@ export class TransactionService {
    */
   static async getByReference(reference: string): Promise<Transaction | null> {
     try {
-      const supabase = await createClient()
+      const supabase = createAdminClient()
       const { data, error } = await supabase
         .from('transactions')
         .select('*')
