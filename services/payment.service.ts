@@ -6,13 +6,24 @@ import { HubtelInitiateRequest, HubtelInitiateResponse } from '@/types/payment'
  * NEVER reads HUBTEL_CALLBACK_URL — that footgun has been removed.
  */
 function getBaseUrl(): string {
-  const domain =
-    process.env.NEXT_PUBLIC_PORTAL_DOMAIN ||
-    process.env.VERCEL_PROJECT_PRODUCTION_URL ||
-    process.env.VERCEL_URL ||
-    'localhost:3000'
-  const protocol = domain.includes('localhost') ? 'http' : 'https'
-  return `${protocol}://${domain}`
+  if (process.env.NEXT_PUBLIC_PORTAL_DOMAIN) {
+    return `https://${process.env.NEXT_PUBLIC_PORTAL_DOMAIN.replace(/^https?:\/\//, '')}`
+  }
+  
+  if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
+    return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+  }
+
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`
+  }
+
+  // If we are in production but none of the above are set, use the known vercel domain
+  if (process.env.NODE_ENV === 'production') {
+    return 'https://motionconnect.vercel.app'
+  }
+
+  return 'http://localhost:3000'
 }
 
 export class PaymentService {
