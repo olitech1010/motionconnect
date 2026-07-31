@@ -1,5 +1,20 @@
 import { HubtelInitiateRequest, HubtelInitiateResponse } from '@/types/payment'
 
+/**
+ * Resolve the canonical base URL for callback/return URLs.
+ * Priority: explicit env > Vercel system vars > localhost fallback.
+ * NEVER reads HUBTEL_CALLBACK_URL — that footgun has been removed.
+ */
+function getBaseUrl(): string {
+  const domain =
+    process.env.NEXT_PUBLIC_PORTAL_DOMAIN ||
+    process.env.VERCEL_PROJECT_PRODUCTION_URL ||
+    process.env.VERCEL_URL ||
+    'localhost:3000'
+  const protocol = domain.includes('localhost') ? 'http' : 'https'
+  return `${protocol}://${domain}`
+}
+
 export class PaymentService {
   /**
    * Initiate Mobile Money payment with Hubtel API
@@ -14,20 +29,17 @@ export class PaymentService {
 
     if (isMock) {
       console.log('--- [DEMO MODE] Initiating Hubtel Payment ---', { request, amount, reference })
-      // Return simulated checkout URL pointing to our local demo payment simulation page
-      const domain = process.env.NEXT_PUBLIC_PORTAL_DOMAIN || 'localhost:3000'
-      const protocol = domain.includes('localhost') ? 'http' : 'https'
+      const baseUrl = getBaseUrl()
       return {
         reference,
         status: 'pending',
-        checkoutUrl: `${protocol}://${domain}/portal/checkout/demo?ref=${reference}&amount=${amount}&phone=${request.phone}`,
+        checkoutUrl: `${baseUrl}/portal/checkout/demo?ref=${reference}&amount=${amount}&phone=${request.phone}`,
       }
     }
 
     const clientId = process.env.HUBTEL_CLIENT_ID
     const clientSecret = process.env.HUBTEL_CLIENT_SECRET
     const merchantAccount = process.env.HUBTEL_MERCHANT_ACCOUNT
-    const callbackUrl = process.env.HUBTEL_CALLBACK_URL
     const authToken = process.env.HUBTEL_AUTH_TOKEN
 
     if ((!authToken && (!clientId || !clientSecret)) || !merchantAccount) {
@@ -38,9 +50,16 @@ export class PaymentService {
     const auth = authToken || Buffer.from(`${clientId}:${clientSecret}`).toString('base64')
 
     try {
-      const domain = process.env.NEXT_PUBLIC_PORTAL_DOMAIN || process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.VERCEL_URL || 'localhost:3000'
-      const protocol = domain.includes('localhost') ? 'http' : 'https'
-      const defaultCallback = `${protocol}://${domain}/api/payments/webhook`
+      const baseUrl = getBaseUrl()
+      const callbackUrl = `${baseUrl}/api/payments/webhook`
+      const returnUrl = `${baseUrl}/?reference=${reference}`
+      const cancellationUrl = `${baseUrl}/portal#cancelled`
+
+      // Log the resolved URLs so we can verify in Vercel function logs
+      console.log('--- Initiating Hubtel Payment ---')
+      console.log('Resolved baseUrl:', baseUrl)
+      console.log('Callback URL:', callbackUrl)
+      console.log('Return URL:', returnUrl)
 
       const myHeaders = new Headers()
       myHeaders.append("Authorization", `Basic ${auth}`)
@@ -49,11 +68,16 @@ export class PaymentService {
       const rawPayload = JSON.stringify({
         totalAmount: amount,
         description: description,
-        callbackUrl: callbackUrl || defaultCallback,
-        returnUrl: `${protocol}://${domain}/?reference=${reference}`,
+        // Send BOTH field names for maximum Hubtel API compatibility
+        callbackUrl: callbackUrl,
+        PrimaryCallbackUrl: callbackUrl,
+        returnUrl: returnUrl,
+        ReturnUrl: returnUrl,
         merchantAccountNumber: merchantAccount,
-        cancellationUrl: `${protocol}://${domain}/portal#cancelled`,
+        cancellationUrl: cancellationUrl,
+        CancellationUrl: cancellationUrl,
         clientReference: reference,
+        ClientReference: reference,
         customerName: request.name || 'Motion Connect User',
       })
 
@@ -64,7 +88,6 @@ export class PaymentService {
         redirect: "follow",
       }
 
-      console.log('--- Initiating Hubtel Payment ---')
       if (process.env.NODE_ENV !== 'production') {
         console.log('Payload:', rawPayload)
         console.log('Auth Header:', `Basic ${auth.substring(0, 8)}...`)
@@ -117,7 +140,61 @@ export class PaymentService {
       }
     }
   }
+
+  /**
+   * Check payment status directly from Hubtel API.
+   * This is the fallback when the webhook doesn't arrive.
+   */
+  static async checkPaymentStatus(reference: string): Promise<{ paid: boolean; transactionId?: string; phone?: string }> {
+    const clientId = process.env.HUBTEL_CLIENT_ID
+    const clientSecret = process.env.HUBTEL_CLIENT_SECRET
+    const authToken = process.env.HUBTEL_AUTH_TOKEN
+
+    if (!authToken && (!clientId || !clientSecret)) {
+      console.warn('Cannot check Hubtel status: missing credentials')
+      return { paid: false }
+    }
+
+    const auth = authToken || Buffer.from(`${clientId}:${clientSecret}`).toString('base64')
+
+    try {
+      // Hubtel Transaction Status Check API
+      const res = await fetch(
+        `https://payproxyapi.hubtel.com/items/initiate/status/${reference}`,
+        {
+          method: 'GET',
+          headers: {
+            'Authorization': `Basic ${auth}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+
+      if (!res.ok) {
+        console.warn(`Hubtel status check failed: ${res.status}`)
+        return { paid: false }
+      }
+
+      const data = await res.json() as Record<string, unknown>
+      console.log('Hubtel status check response:', JSON.stringify(data))
+
+      // Check various Hubtel response formats for success
+      const responseCode = (data as { ResponseCode?: string }).ResponseCode
+      const status = ((data as { Status?: string }).Status || '').toLowerCase()
+      const dataObj = data as { Data?: { TransactionId?: string; CustomerPhoneNumber?: string } }
+
+      if (responseCode === '0000' || status === 'success' || status === 'paid') {
+        return {
+          paid: true,
+          transactionId: dataObj.Data?.TransactionId || 'HUBTEL_STATUS_CHECK',
+          phone: dataObj.Data?.CustomerPhoneNumber,
+        }
+      }
+
+      return { paid: false }
+    } catch (err) {
+      console.error('Hubtel status check error:', err)
+      return { paid: false }
+    }
+  }
 }
-
-// Service ready for production & sandbox Hubtel API
-
