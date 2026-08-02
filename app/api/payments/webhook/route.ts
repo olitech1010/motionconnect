@@ -24,7 +24,8 @@ export async function POST(request: Request) {
     }
 
     const payload = JSON.parse(rawBody)
-    const reference = payload.ClientReference || payload.clientReference || payload.reference
+    const data = payload.Data || payload.data || payload
+    const reference = data.ClientReference || data.clientReference || data.reference || payload.ClientReference
     const status = payload.ResponseCode === '0000' || payload.status?.toLowerCase() === 'success' || payload.Status?.toLowerCase() === 'success'
       ? 'success'
       : 'failed'
@@ -60,12 +61,12 @@ export async function POST(request: Request) {
         comment: `Txn Ref: ${reference} | Hubtel Webhook`,
       })
 
-      const phoneFromWebhook = payload.CustomerPhoneNumber || payload.customerPhoneNumber || undefined
+      const phoneFromWebhook = data.CustomerPhoneNumber || data.customerPhoneNumber || undefined
 
       // Update Database
       await TransactionService.updateTransaction(reference, {
         status: 'success',
-        hubtel_reference: payload.TransactionId || payload.transactionId || 'WEBHOOK_TXN',
+        hubtel_reference: data.CheckoutId || data.TransactionId || data.transactionId || 'WEBHOOK_TXN',
         voucher_code: voucher,
         mikrotik_username: username,
         mikrotik_synced: true,

@@ -39,7 +39,7 @@ export class PaymentService {
     const isMock = process.env.HUBTEL_MOCK === 'true' || process.env.HUBTEL_CLIENT_ID === 'demo_client_id' || process.env.HUBTEL_MERCHANT_ACCOUNT === 'demo_merchant_account'
 
     if (isMock) {
-      console.log('--- [DEMO MODE] Initiating Hubtel Payment ---', { request, amount, reference })
+      if (process.env.NODE_ENV !== 'production') console.log('--- [DEMO MODE] Initiating Hubtel Payment ---', { request, amount, reference })
       const baseUrl = getBaseUrl()
       return {
         reference,
@@ -67,10 +67,12 @@ export class PaymentService {
       const cancellationUrl = `${baseUrl}/portal#cancelled`
 
       // Log the resolved URLs so we can verify in Vercel function logs
-      console.log('--- Initiating Hubtel Payment ---')
-      console.log('Resolved baseUrl:', baseUrl)
-      console.log('Callback URL:', callbackUrl)
-      console.log('Return URL:', returnUrl)
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('--- Initiating Hubtel Payment ---')
+        console.log('Resolved baseUrl:', baseUrl)
+        console.log('Callback URL:', callbackUrl)
+        console.log('Return URL:', returnUrl)
+      }
 
       const myHeaders = new Headers()
       myHeaders.append("Authorization", `Basic ${auth}`)
@@ -114,11 +116,13 @@ export class PaymentService {
 
       const rawText = await response.text()
 
-      console.log('=== [HUBTEL RESPONSE LOG] ===')
-      console.log('Status Code:', response.status, response.statusText)
-      console.log('Headers:', JSON.stringify(responseHeaders, null, 2))
-      console.log('Raw Body:', rawText || '<EMPTY BODY>')
-      console.log('=============================')
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('=== [HUBTEL RESPONSE LOG] ===')
+        console.log('Status Code:', response.status, response.statusText)
+        console.log('Headers:', JSON.stringify(responseHeaders, null, 2))
+        console.log('Raw Body:', rawText || '<EMPTY BODY>')
+        console.log('=============================')
+      }
 
       if (!response.ok) {
         console.error('Hubtel Error Response:', response.status, rawText)
@@ -169,17 +173,17 @@ export class PaymentService {
     const auth = authToken || Buffer.from(`${clientId}:${clientSecret}`).toString('base64')
 
     try {
-      // Hubtel Transaction Status Check API (PayProxy POST endpoint)
+      const merchantAccount = process.env.HUBTEL_MERCHANT_ACCOUNT || '2011037' // Fallback to live account if not set
+
+      // Hubtel Transaction Status Check API (GET endpoint)
       const res = await fetch(
-        `https://payproxyapi.hubtel.com/transaction/status`,
+        `https://api-txnstatus.hubtel.com/transactions/${merchantAccount}/status?clientReference=${reference}`,
         {
-          method: 'POST',
+          method: 'GET',
           headers: {
             'Authorization': `Basic ${auth}`,
-            'Content-Type': 'application/json',
             'Accept': 'application/json',
           },
-          body: JSON.stringify({ ClientReference: reference }),
         }
       )
 
@@ -189,8 +193,14 @@ export class PaymentService {
       }
 
       interface HubtelStatusResponse {
+        responseCode?: string
         ResponseCode?: string
+        status?: string
         Status?: string
+        data?: {
+          transactionId?: string
+          status?: string
+        }
         Data?: {
           TransactionId?: string
           CustomerPhoneNumber?: string
@@ -198,16 +208,18 @@ export class PaymentService {
       }
 
       const data = await res.json() as HubtelStatusResponse
-      console.log('Hubtel status check response:', JSON.stringify(data))
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('Hubtel status check response:', JSON.stringify(data))
+      }
 
       // Check various Hubtel response formats for success
-      const responseCode = data.ResponseCode
-      const status = (data.Status || '').toLowerCase()
+      const responseCode = data.responseCode || data.ResponseCode
+      const status = (data.data?.status || data.status || data.Status || '').toLowerCase()
       
       if (responseCode === '0000' || responseCode === '00' || status === 'completed' || status === 'success' || status === 'paid') {
         return {
           paid: true,
-          transactionId: data.Data?.TransactionId || 'HUBTEL_STATUS_CHECK',
+          transactionId: data.data?.transactionId || data.Data?.TransactionId || 'HUBTEL_STATUS_CHECK',
           phone: data.Data?.CustomerPhoneNumber,
         }
       }
