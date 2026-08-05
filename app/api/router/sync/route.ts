@@ -28,11 +28,11 @@ export async function GET(request: NextRequest) {
       throw error;
     }
 
-    if (!transactions || transactions.length === 0) {
-      return new NextResponse('', { status: 200, headers: { 'Content-Type': 'text/plain' } });
-    }
-
     let responseText = 'username;password;profile;limit-uptime;reference\n'
+    
+    if (!transactions || transactions.length === 0) {
+      return new NextResponse(responseText.trim(), { status: 200, headers: { 'Content-Type': 'text/plain' } });
+    }
     
     for (const tx of transactions) {
       const pkg = tx.package_id ? await PackageService.getPackageById(tx.package_id) : null
@@ -54,9 +54,8 @@ export async function GET(request: NextRequest) {
       responseText += `${username};${username};${profile};${limitUptime};${tx.reference}\n`;
     }
 
-    // Only return empty 200 if all packages were missing
     if (responseText === 'username;password;profile;limit-uptime;reference\n') {
-      return new NextResponse('', { status: 200, headers: { 'Content-Type': 'text/plain' } });
+      return new NextResponse(responseText.trim(), { status: 200, headers: { 'Content-Type': 'text/plain' } });
     }
 
     return new NextResponse(responseText.trim(), {
