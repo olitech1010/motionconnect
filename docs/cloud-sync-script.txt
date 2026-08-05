@@ -1,0 +1,66 @@
+:local apiKey [/system script environment get [find name=syncApiKey] value]
+:local syncUrl [/system script environment get [find name=syncUrl] value]
+:local confirmUrl [/system script environment get [find name=confirmUrl] value]
+
+:local fetchUrl ("$syncUrl?key=$apiKey")
+
+:do {
+  :local result [/tool fetch url=$fetchUrl mode=https http-method=get output=user as-value]
+
+  :if ($result->"status" = "finished") do={
+    :local body ($result->"data")
+
+    :if ([:len $body] < 5) do={
+      :return
+    }
+
+    :local lines [:toarray ""]
+    :local lineStart 0
+    :local synced ""
+
+    :for i from=0 to=([:len $body] - 1) do={
+      :if ([:pick $body $i ($i + 1)] = "\n") do={
+        :local line [:pick $body $lineStart $i]
+        :set lineStart ($i + 1)
+
+        :if ($line != "username;password;profile;limit-uptime;reference" && [:len $line] > 5) do={
+          :local semi1 [:find $line ";" 0]
+          :local semi2 [:find $line ";" ($semi1 + 1)]
+          :local semi3 [:find $line ";" ($semi2 + 1)]
+          :local semi4 [:find $line ";" ($semi3 + 1)]
+
+          :local uname [:pick $line 0 $semi1]
+          :local upass [:pick $line ($semi1 + 1) $semi2]
+          :local uprof [:pick $line ($semi2 + 1) $semi3]
+          :local utime [:pick $line ($semi3 + 1) $semi4]
+          :local uref  [:pick $line ($semi4 + 1) [:len $line]]
+
+          :if ([:len [/ip hotspot user find name=$uname]] = 0) do={
+            :do {
+              /ip hotspot user add name=$uname password=$upass profile=$uprof limit-uptime=$utime comment=("Cloud Sync | $uref")
+              :log info ("Hotspot user created: $uname (ref: $uref)")
+              :if ([:len $synced] > 0) do={
+                :set synced "$synced\n$uref"
+              } else={
+                :set synced $uref
+              }
+            } on-error={
+              :log error ("Failed to create hotspot user: $uname")
+            }
+          }
+        }
+      }
+    }
+
+    :if ([:len $synced] > 0) do={
+      :do {
+        /tool fetch url=$confirmUrl mode=https http-method=post http-header-field="x-api-key: $apiKey" http-data=$synced output=none
+        :log info ("Cloud sync confirmed for users")
+      } on-error={
+        :log warning ("Failed to confirm sync with cloud server")
+      }
+    }
+  }
+} on-error={
+  :log warning ("Cloud sync fetch failed - will retry next cycle")
+}
