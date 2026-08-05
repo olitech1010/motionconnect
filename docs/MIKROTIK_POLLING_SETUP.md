@@ -26,7 +26,16 @@ add name=confirmUrl value="https://motionconnect.vercel.app/api/router/confirm"
 
 ## Step 2: Create the Sync Script
 
-Paste this entire block into the MikroTik terminal:
+There are two ways to add this script:
+
+**Option A: Using the Terminal (Fastest)**
+Paste this entire block into the MikroTik terminal and **press Enter**. The `/system script add` command automatically creates and saves the script in one go.
+
+**Option B: Using WinBox GUI**
+1. Go to **System** -> **Scripts** -> **Add New (+)**
+2. Set Name to `cloud-sync-users`
+3. Paste only the code *inside* the outer `{ }` braces into the Source box.
+4. Click **Apply** and **OK**.
 
 ```routeros
 /system script add name="cloud-sync-users" policy=read,write,test,ftp source={
