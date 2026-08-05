@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
     }
 
     if (!transactions || transactions.length === 0) {
-      return new NextResponse(null, { status: 204 });
+      return new NextResponse('', { status: 200, headers: { 'Content-Type': 'text/plain' } });
     }
 
     let responseText = 'username;password;profile;limit-uptime;reference\n'
@@ -54,9 +54,9 @@ export async function GET(request: NextRequest) {
       responseText += `${username};${username};${profile};${limitUptime};${tx.reference}\n`;
     }
 
-    // Only return 204 if all packages were missing
+    // Only return empty 200 if all packages were missing
     if (responseText === 'username;password;profile;limit-uptime;reference\n') {
-      return new NextResponse(null, { status: 204 });
+      return new NextResponse('', { status: 200, headers: { 'Content-Type': 'text/plain' } });
     }
 
     return new NextResponse(responseText.trim(), {
