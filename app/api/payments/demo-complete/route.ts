@@ -28,13 +28,7 @@ export async function POST(request: Request) {
     const voucher = `MC-${Math.random().toString(36).substring(2, 8).toUpperCase()}`
     const username = voucher.toLowerCase()
 
-    // Provision Hotspot User on MikroTik (mock or live)
-    await RouterService.createHotspotUser({
-      name: username,
-      password: username,
-      profile: profile,
-      comment: `Txn Ref: ${reference} | Phone: ${transaction.phone}`,
-    })
+    // (Demo Mode: mock router creation and just mark synced in DB)
 
     // Update database record
     await TransactionService.updateTransaction(reference, {
