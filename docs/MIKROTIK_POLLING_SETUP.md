@@ -11,20 +11,7 @@ This guide configures your MikroTik RB5009 to automatically poll the MotionConne
 
 ---
 
-## Step 1: Set the API Key
-
-Replace `YOUR_SECRET_KEY_HERE` with the same key you set in your Vercel environment variable `ROUTER_SYNC_API_KEY`. Generate one at https://generate-random.org/api-key-generator (32 characters, alphanumeric).
-
-```routeros
-/system script environment
-add name=syncApiKey value="YOUR_SECRET_KEY_HERE"
-add name=syncUrl value="https://motionconnect.vercel.app/api/router/sync"
-add name=confirmUrl value="https://motionconnect.vercel.app/api/router/confirm"
-```
-
----
-
-## Step 2: Create the Sync Script
+## Step 1: Create the Sync Script
 
 There are two ways to add this script:
 
@@ -39,9 +26,9 @@ Paste this entire block into the MikroTik terminal and **press Enter**. The `/sy
 
 ```routeros
 /system script add name="cloud-sync-users" policy=read,write,test,ftp source={
-:local apiKey [/system script environment get [find name=syncApiKey] value]
-:local syncUrl [/system script environment get [find name=syncUrl] value]
-:local confirmUrl [/system script environment get [find name=confirmUrl] value]
+:local apiKey "Tq22rgVP9ljKMjGd4mIIVqLkz24l30FQq7mB"
+:local syncUrl "https://motionconnect.vercel.app/api/router/sync"
+:local confirmUrl "https://motionconnect.vercel.app/api/router/confirm"
 
 :local fetchUrl ("$syncUrl?key=$apiKey")
 
@@ -110,7 +97,7 @@ Paste this entire block into the MikroTik terminal and **press Enter**. The `/sy
 
 ---
 
-## Step 3: Create the Scheduler (runs every 10 seconds)
+## Step 2: Create the Scheduler (runs every 10 seconds)
 
 ```routeros
 /system scheduler add name="cloud-sync-scheduler" interval=10s on-event="/system script run cloud-sync-users" policy=read,write,test,ftp comment="Polls cloud server for paid hotspot users"
@@ -118,7 +105,7 @@ Paste this entire block into the MikroTik terminal and **press Enter**. The `/sy
 
 ---
 
-## Step 4: Verify It Works
+## Step 3: Verify It Works
 
 1. Make a test payment through the portal
 2. Watch the router log:
