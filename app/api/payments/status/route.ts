@@ -31,6 +31,13 @@ export async function GET(request: Request) {
     const durationSec = pkg?.duration_seconds || 86400
 
     if (transaction.status === 'success') {
+      if (transaction.mikrotik_synced === false) {
+        return NextResponse.json({
+          status: 'syncing',
+          message: 'Your payment was successful! Setting up your Wi-Fi access...',
+        })
+      }
+
       const expDate = transaction.expires_at
         ? new Date(transaction.expires_at).toLocaleDateString()
         : new Date(new Date(transaction.created_at).getTime() + durationSec * 1000).toLocaleDateString()
@@ -120,18 +127,7 @@ export async function GET(request: Request) {
           const voucher = `MC-${crypto.randomBytes(4).toString('hex').toUpperCase()}`
           const username = voucher.toLowerCase()
 
-          // Create Hotspot User on MikroTik
-          try {
-            await RouterService.createHotspotUser({
-              name: username,
-              password: username,
-              profile: profile,
-              comment: `Txn Ref: ${reference} | Hubtel Status Fallback`,
-            })
-          } catch (routerErr) {
-            console.error('[STATUS FALLBACK] Router user creation failed:', routerErr)
-            // Continue — don't block the payment success response
-          }
+
 
           // Update Database
           await TransactionService.updateTransaction(reference, {
@@ -139,7 +135,7 @@ export async function GET(request: Request) {
             hubtel_reference: hubtelStatus.transactionId || 'STATUS_CHECK',
             voucher_code: voucher,
             mikrotik_username: username,
-            mikrotik_synced: true,
+            mikrotik_synced: false,
             sms_status: 'sent',
             expires_at: expiresAt,
             ...(hubtelStatus.phone && { phone: hubtelStatus.phone }),

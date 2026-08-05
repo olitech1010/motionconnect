@@ -113,7 +113,7 @@ export function CaptivePortal({ initialPackages, mikrotikParams, returnReference
   // Poll payment status from /api/payments/status
   const startPolling = useCallback((reference: string, startTime: number) => {
     const checkStatus = async () => {
-      if (Date.now() - startTime > 120000) {
+      if (Date.now() - startTime > 180000) {
         setIsProcessing(false)
         setErrorMsg('Payment request timed out. If you were charged, please contact support.')
         return
@@ -130,6 +130,11 @@ export function CaptivePortal({ initialPackages, mikrotikParams, returnReference
           setLoginPass(data.credentials.password)
           setCountdown(60)
           setActiveTab('creds')
+        } else if (data.status === 'syncing') {
+          // Payment confirmed, waiting for router to create the user
+          setOvTitle('Payment Successful! 🎉')
+          setOvMsg('Setting up your Wi-Fi access… This takes a few seconds.')
+          setTimeout(() => checkStatus(), 3000)
         } else if (data.status === 'failed') {
           setIsProcessing(false)
           setErrorMsg(data.message || 'Payment failed or was declined.')

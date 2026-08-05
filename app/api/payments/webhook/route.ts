@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
 import crypto from 'crypto'
 import { TransactionService } from '@/services/transaction.service'
-import { RouterService } from '@/services/router.service'
 import { PackageService } from '@/services/package.service'
 import { createAdminClient } from '@/lib/supabase/admin'
 
@@ -45,7 +44,6 @@ export async function POST(request: Request) {
 
     if (status === 'success') {
       const pkg = transaction.package_id ? await PackageService.getPackageById(transaction.package_id) : null
-      const profile = pkg?.mikrotik_profile || 'weekly'
       const durationSec = pkg?.duration_seconds || 86400
       const expiresAt = new Date(Date.now() + durationSec * 1000).toISOString()
 
@@ -53,13 +51,6 @@ export async function POST(request: Request) {
       const voucher = `MC-${crypto.randomBytes(4).toString('hex').toUpperCase()}`
       const username = voucher.toLowerCase()
 
-      // Create Hotspot User on MikroTik
-      await RouterService.createHotspotUser({
-        name: username,
-        password: username,
-        profile: profile,
-        comment: `Txn Ref: ${reference} | Hubtel Webhook`,
-      })
 
       const phoneFromWebhook = data.CustomerPhoneNumber || data.customerPhoneNumber || undefined
 
@@ -69,7 +60,7 @@ export async function POST(request: Request) {
         hubtel_reference: data.CheckoutId || data.TransactionId || data.transactionId || 'WEBHOOK_TXN',
         voucher_code: voucher,
         mikrotik_username: username,
-        mikrotik_synced: true,
+        mikrotik_synced: false,
         sms_status: 'sent',
         expires_at: expiresAt,
         ...(phoneFromWebhook && { phone: phoneFromWebhook }),
