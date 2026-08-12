@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
 
       payload.push({
         id: tx.reference,
-        mac: tx.mac_address || '00:00:00:00:00:00',
+        mac: (tx.mac_address || '00:00:00:00:00:00').toUpperCase(),
         username,
         password: username, // Password MUST match username — single value, no mismatch
         profile,
