@@ -2,9 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { TransactionService } from '@/services/transaction.service';
 
 export async function POST(request: NextRequest) {
-  const authHeader = request.headers.get('x-api-key');
-  const queryParam = request.nextUrl.searchParams.get('key');
-  const apiKey = authHeader || queryParam;
+  // Accept both header names for backwards compatibility
+  const apiKey =
+    request.headers.get('x-router-key') ||
+    request.headers.get('x-api-key') ||
+    request.nextUrl.searchParams.get('key');
 
   if (apiKey !== process.env.ROUTER_SYNC_API_KEY) {
     if (process.env.NODE_ENV !== 'production') {
@@ -14,16 +16,27 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const textBody = await request.text();
-    const references = textBody
-      .split('\n')
-      .map(line => line.trim())
-      .filter(line => line.length > 0);
+    let references: string[] = [];
+
+    // Support both JSON body (new router-poll.rsc) and plain text (legacy script)
+    const contentType = request.headers.get('content-type') || '';
+
+    if (contentType.includes('application/json')) {
+      // New JSON format: { "ids": ["ref1", "ref2"] }
+      const body = await request.json();
+      references = body.ids || [];
+    } else {
+      // Legacy plain text format: newline-separated references
+      const textBody = await request.text();
+      references = textBody
+        .split('\n')
+        .map((line: string) => line.trim())
+        .filter((line: string) => line.length > 0);
+    }
 
     let syncedCount = 0;
 
     for (const ref of references) {
-      // mark it as synced in the database
       try {
         await TransactionService.updateTransaction(ref, {
           mikrotik_synced: true

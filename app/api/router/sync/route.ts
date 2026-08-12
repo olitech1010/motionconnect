@@ -3,9 +3,11 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { PackageService } from '@/services/package.service'
 
 export async function GET(request: NextRequest) {
-  const authHeader = request.headers.get('x-api-key');
-  const queryParam = request.nextUrl.searchParams.get('key');
-  const apiKey = authHeader || queryParam;
+  // Accept both header names for backwards compatibility
+  const apiKey =
+    request.headers.get('x-router-key') ||
+    request.headers.get('x-api-key') ||
+    request.nextUrl.searchParams.get('key');
 
   if (apiKey !== process.env.ROUTER_SYNC_API_KEY) {
     if (process.env.NODE_ENV !== 'production') {
@@ -28,14 +30,14 @@ export async function GET(request: NextRequest) {
       throw error;
     }
 
-    let responseText = 'username;password;profile;limit-uptime;reference\n'
-    
     if (!transactions || transactions.length === 0) {
-      return new NextResponse(responseText.trim(), { status: 200, headers: { 'Content-Type': 'text/plain' } });
+      return NextResponse.json([]);
     }
     
+    const payload = [];
+
     for (const tx of transactions) {
-      const pkg = tx.package_id ? await PackageService.getPackageById(tx.package_id) : null
+      const pkg = tx.package_id ? await PackageService.getPackageById(tx.package_id) : null;
       if (!pkg) continue;
       
       const username = tx.mikrotik_username || tx.voucher_code?.toLowerCase() || tx.reference.toLowerCase();
@@ -50,25 +52,26 @@ export async function GET(request: NextRequest) {
       }
 
       const profile = pkg.mikrotik_profile || 'default';
-      
-      responseText += `${username};${username};${profile};${limitUptime};${tx.reference}\n`;
+
+      payload.push({
+        id: tx.reference,
+        mac: tx.mac_address || '00:00:00:00:00:00',
+        username,
+        password: username, // Password MUST match username — single value, no mismatch
+        profile,
+        uptime: limitUptime,
+      });
     }
 
-    if (responseText === 'username;password;profile;limit-uptime;reference\n') {
-      return new NextResponse(responseText, { status: 200, headers: { 'Content-Type': 'text/plain' } });
-    }
-
-    return new NextResponse(responseText, {
-      status: 200,
-      headers: {
-        'Content-Type': 'text/plain'
-      }
-    });
+    return NextResponse.json(payload);
 
   } catch (err) {
     if (process.env.NODE_ENV !== 'production') {
       console.error('Router sync error:', err);
     }
-    return new NextResponse('Internal Server Error', { status: 500 });
+    return NextResponse.json(
+      { error: 'Internal Server Error' },
+      { status: 500 }
+    );
   }
 }
