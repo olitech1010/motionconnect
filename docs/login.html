@@ -501,7 +501,7 @@
     fetch(PAYMENT_CONFIG.initiateEndpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ packageId: selected.id, amount: selected.amount, phone: phone })
+      body: JSON.stringify({ packageId: selected.id, amount: selected.amount, phone: phone, macAddress: "$(mac)", ipAddress: "$(ip)" })
     })
     .then(function (r) { return r.json(); })
     .then(function (data) {
