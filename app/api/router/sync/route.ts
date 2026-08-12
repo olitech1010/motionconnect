@@ -55,10 +55,10 @@ export async function GET(request: NextRequest) {
     }
 
     if (responseText === 'username;password;profile;limit-uptime;reference\n') {
-      return new NextResponse(responseText.trim(), { status: 200, headers: { 'Content-Type': 'text/plain' } });
+      return new NextResponse(responseText, { status: 200, headers: { 'Content-Type': 'text/plain' } });
     }
 
-    return new NextResponse(responseText.trim(), {
+    return new NextResponse(responseText, {
       status: 200,
       headers: {
         'Content-Type': 'text/plain'
