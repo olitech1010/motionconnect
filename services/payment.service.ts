@@ -28,6 +28,26 @@ function getBaseUrl(): string {
 
 export class PaymentService {
   /**
+   * Helper to detect Ghanaian Mobile Money network from phone number prefix
+   */
+  private static detectNetwork(phone: string): string {
+    let p = phone
+    if (p.startsWith('+233')) p = '0' + p.substring(4)
+    else if (p.startsWith('233') && p.length >= 12) p = '0' + p.substring(3)
+    
+    const prefix = p.substring(0, 3)
+    
+    if (['024', '025', '053', '054', '055', '059', '033'].includes(prefix)) {
+      return 'mtn-gh'
+    } else if (['020', '050'].includes(prefix)) {
+      return 'vodafone-gh'
+    } else if (['027', '057', '026', '056'].includes(prefix)) {
+      return 'tigo-gh'
+    }
+    // Default to MTN if unknown
+    return 'mtn-gh'
+  }
+  /**
    * Initiate Mobile Money payment with Hubtel API
    */
   static async initiatePayment(
@@ -64,7 +84,6 @@ export class PaymentService {
       const baseUrl = getBaseUrl()
       const callbackUrl = `${baseUrl}/api/payments/webhook`
       const returnUrl = `${baseUrl}/?reference=${reference}`
-      const cancellationUrl = `${baseUrl}/portal#cancelled`
 
       // Log the resolved URLs so we can verify in Vercel function logs
       if (process.env.NODE_ENV !== 'production') {
@@ -78,20 +97,16 @@ export class PaymentService {
       myHeaders.append("Authorization", `Basic ${auth}`)
       myHeaders.append("Content-Type", "application/json")
 
+      const channel = this.detectNetwork(request.phone)
+
       const rawPayload = JSON.stringify({
-        totalAmount: amount,
-        description: description,
-        // Send BOTH field names for maximum Hubtel API compatibility
-        callbackUrl: callbackUrl,
+        CustomerName: request.name || 'Motion Connect User',
+        CustomerMsisdn: request.phone,
+        Channel: channel,
+        Amount: amount,
         PrimaryCallbackUrl: callbackUrl,
-        returnUrl: returnUrl,
-        ReturnUrl: returnUrl,
-        merchantAccountNumber: merchantAccount,
-        cancellationUrl: cancellationUrl,
-        CancellationUrl: cancellationUrl,
-        clientReference: reference,
+        Description: description,
         ClientReference: reference,
-        customerName: request.name || 'Motion Connect User',
       })
 
       const requestOptions: RequestInit = {
@@ -106,7 +121,7 @@ export class PaymentService {
         console.log('Auth Header:', `Basic ${auth.substring(0, 8)}...`)
       }
 
-      const response = await fetch('https://payproxyapi.hubtel.com/items/initiate', requestOptions)
+      const response = await fetch(`https://rmp.hubtel.com/merchantaccount/merchants/${merchantAccount}/receive/mobilemoney`, requestOptions)
 
       // Convert response headers to a plain object for logging
       const responseHeaders: Record<string, string> = {}
@@ -129,22 +144,13 @@ export class PaymentService {
         return {
           reference,
           status: 'failed',
-          message: `Hubtel Error (${response.status}): ${rawText}`,
+          message: 'Payment provider rejected the request',
         }
       }
 
-      let data: Record<string, unknown> = {}
-      try {
-        data = rawText ? JSON.parse(rawText) : {}
-      } catch {
-        console.error('Failed to parse Hubtel JSON response')
-      }
-
-      const dataObj = data as { data?: { checkoutUrl?: string }; checkoutUrl?: string }
       return {
         reference,
         status: 'pending',
-        checkoutUrl: dataObj.data?.checkoutUrl || dataObj.checkoutUrl,
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Unknown Hubtel error'
@@ -173,7 +179,10 @@ export class PaymentService {
     const auth = authToken || Buffer.from(`${clientId}:${clientSecret}`).toString('base64')
 
     try {
-      const merchantAccount = process.env.HUBTEL_MERCHANT_ACCOUNT || '2011037' // Fallback to live account if not set
+      const merchantAccount = process.env.HUBTEL_MERCHANT_ACCOUNT
+      if (!merchantAccount) {
+        throw new Error('Hubtel merchant account missing from environment')
+      }
 
       // Hubtel Transaction Status Check API (GET endpoint)
       const res = await fetch(

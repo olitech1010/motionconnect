@@ -31,6 +31,7 @@ export function CaptivePortal({ initialPackages, mikrotikParams, returnReference
     initialPackages.length > 0 ? initialPackages[0].id : null
   )
   const [name, setName] = useState('')
+  const [phone, setPhone] = useState('')
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   
   // Overlay & Polling State
@@ -53,13 +54,6 @@ export function CaptivePortal({ initialPackages, mikrotikParams, returnReference
 
   // Promo Slider State
   const [promoIdx, setPromoIdx] = useState(0)
-
-  // CNA (Captive Network Assistant) Detection via lazy initializer
-  const [isCna] = useState(() => {
-    if (typeof window === 'undefined') return false
-    const ua = window.navigator.userAgent
-    return /CaptiveNetwork|AppleWebKit.*Mobile.*|Dalvik.*|CaptivePortal/i.test(ua) && !/Safari/i.test(ua)
-  })
 
   // Resolve persisted MikroTik params: URL params take priority, then sessionStorage
   const persistedParams = useMemo(() => {
@@ -186,6 +180,11 @@ export function CaptivePortal({ initialPackages, mikrotikParams, returnReference
       return
     }
 
+    if (!phone || phone.trim().length < 9) {
+      setErrorMsg('Please enter a valid Mobile Money number.')
+      return
+    }
+
     const selectedPkg = initialPackages.find((p) => p.id === selectedPkgId)
     if (!selectedPkg) return
 
@@ -200,6 +199,7 @@ export function CaptivePortal({ initialPackages, mikrotikParams, returnReference
         body: JSON.stringify({
           packageId: selectedPkg.id,
           amount: selectedPkg.amount,
+          phone: phone.trim(),
           name: name.trim() || 'Motion Connect User',
           macAddress: persistedParams?.mac,
           ipAddress: persistedParams?.ip,
@@ -246,15 +246,6 @@ export function CaptivePortal({ initialPackages, mikrotikParams, returnReference
     <div className="min-h-screen bg-kumo-brand text-cream py-6 px-4 font-sans antialiased selection:bg-selection-bg selection:text-cream">
       <div className="max-w-[460px] mx-auto">
         
-        {/* ============ CNA DETECTED WARNING ============ */}
-        {isCna && (
-          <div className="mb-4 bg-cream/10 border border-cream/20 rounded-lg p-3.5 flex items-start gap-3 shadow-none">
-            <ShieldAlert className="w-5 h-5 text-cream shrink-0 mt-0.5" />
-            <div className="text-xs text-cream leading-relaxed">
-              <span className="font-bold">Captive Portal Browser Detected:</span> Please copy or screenshot your login credentials when generated before closing this screen.
-            </div>
-          </div>
-        )}
 
         {/* ============ TOP BAR ============ */}
         <header className="flex items-center justify-between mb-4 px-0.5">
@@ -406,9 +397,23 @@ export function CaptivePortal({ initialPackages, mikrotikParams, returnReference
               />
             </div>
 
-
-
-            {/* Error Message Banner */}
+            {/* Phone Number Field */}
+            <div className="mt-4">
+              <label htmlFor="phone" className="block text-xs font-bold text-[#3A4A5E] mb-1.5 tracking-wide">
+                Mobile Money Number <span className="text-emergency-red">*</span>
+              </label>
+              <input
+                id="phone"
+                type="tel"
+                autoComplete="tel"
+                placeholder="e.g. 0541234567"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
+                maxLength={10}
+                required
+                className="w-full font-medium text-base text-[#0D1B2A] bg-[#F7F9FC] border-2 border-[#CBD6E2] rounded-xl py-3 px-3.5 focus:outline-none focus:border-[#1466B8] focus:bg-white focus:shadow-[0_0_0_3px_rgba(20,102,184,0.15)] transition-all placeholder:text-[#667891]/60"
+              />
+            </div>            {/* Error Message Banner */}
             {errorMsg && (
               <div className="mt-3.5 bg-emergency-red/10 border border-emergency-red/20 text-emergency-red text-[13px] font-medium py-2.5 px-3.5 rounded-md flex items-center gap-2">
                 <ShieldAlert className="w-4 h-4 shrink-0" />

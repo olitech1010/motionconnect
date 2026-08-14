@@ -56,6 +56,7 @@ export async function GET(request: NextRequest) {
       payload.push({
         id: tx.reference,
         mac: (tx.mac_address || '00:00:00:00:00:00').toUpperCase(),
+        ip: tx.ip_address || '', // Fallback for the router to resolve MAC itself
         username,
         password: username, // Password MUST match username — single value, no mismatch
         profile,

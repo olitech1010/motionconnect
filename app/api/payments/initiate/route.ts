@@ -5,12 +5,12 @@ import { TransactionService } from '@/services/transaction.service'
 import { PaymentService } from '@/services/payment.service'
 
 const InitiateSchema = z.object({
-  packageId: z.string().min(1, 'Package ID is required'),
+  packageId: z.string().min(1, 'Package ID is required').max(100),
   amount: z.number().positive('Amount must be positive'),
-  phone: z.string().optional(),
-  name: z.string().optional(),
-  macAddress: z.string().optional(),
-  ipAddress: z.string().optional(),
+  phone: z.string().regex(/^\+?\d{9,15}$/, 'Valid numeric phone number is required').max(20),
+  name: z.string().max(100).optional(),
+  macAddress: z.string().max(100).optional(),
+  ipAddress: z.string().max(100).optional(),
 })
 
 export async function POST(request: Request) {
@@ -26,7 +26,7 @@ export async function POST(request: Request) {
     }
 
     const { packageId, phone, name, macAddress, ipAddress } = validation.data
-    const cleanPhone = phone ? phone.replace(/\D/g, '') : '0000000000'
+    const cleanPhone = phone.replace(/\D/g, '')
     const userAgent = request.headers.get('user-agent') || 'Unknown Device'
     const forwardedIp = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || ipAddress || 'Unknown IP'
     const mac = macAddress || '00:00:00:00:00:00'
@@ -87,7 +87,7 @@ export async function POST(request: Request) {
     const msg = error instanceof Error ? error.message : 'Internal server error during payment initiation'
     console.error('Payment Initiate Error:', msg)
     return NextResponse.json(
-      { success: false, message: msg },
+      { success: false, message: 'Internal server error during payment initiation' },
       { status: 500 }
     )
   }

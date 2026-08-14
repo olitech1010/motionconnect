@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
 import { TransactionService } from '@/services/transaction.service'
-import { RouterService } from '@/services/router.service'
 import { PackageService } from '@/services/package.service'
 
 export async function POST(request: Request) {
@@ -21,7 +20,6 @@ export async function POST(request: Request) {
     }
 
     const pkg = transaction.package_id ? await PackageService.getPackageById(transaction.package_id) : null
-    const profile = pkg?.mikrotik_profile || 'weekly'
     const durationSec = pkg?.duration_seconds || 86400
     const expiresAt = new Date(Date.now() + durationSec * 1000).toISOString()
 

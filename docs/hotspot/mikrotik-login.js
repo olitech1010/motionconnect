@@ -51,7 +51,7 @@ async function rest(method, path, body) {
     method,
     headers: { 'Content-Type': 'application/json', Authorization: authHeader() },
     body: body ? JSON.stringify(body) : undefined,
-    // @ts-ignore Node supports agent
+    // @ts-expect-error Node supports agent
     agent,
   });
   const text = await res.text();
