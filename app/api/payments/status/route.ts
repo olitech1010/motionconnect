@@ -104,7 +104,14 @@ export async function GET(request: Request) {
     // === SERVER-SIDE HUBTEL STATUS CHECK FALLBACK ===
     // If transaction has been pending for 30+ seconds, check Hubtel directly
     // This handles the case where the webhook was lost/delayed/blocked
-    if (!isMock && transaction.status === 'pending') {
+    // Only usable once Hubtel whitelists our egress IP: api-txnstatus.hubtel.com
+    // answers 403 (WAF HTML, not JSON) from any other source, so until then this
+    // check can only ever return paid:false — and it would add a blocking
+    // outbound call to every single poll. Enable with HUBTEL_STATUS_CHECK=true
+    // the day whitelisting lands.
+    const statusCheckAvailable = process.env.HUBTEL_STATUS_CHECK === 'true'
+
+    if (!isMock && statusCheckAvailable && transaction.status === 'pending') {
       const createdAt = new Date(transaction.created_at).getTime()
       const elapsed = Date.now() - createdAt
 
@@ -146,18 +153,13 @@ export async function GET(request: Request) {
             // Non-critical logging failure
           }
 
-          const expDate = new Date(Date.now() + durationSec * 1000).toLocaleDateString()
-
+          // mikrotik_synced is still false here — the router has not created the
+          // hotspot user yet. Reporting 'success' would hand the student
+          // credentials that fail at the login form, so mirror the branch above
+          // and let them through on the next poll once the router confirms.
           return NextResponse.json({
-            status: 'success',
-            credentials: {
-              voucher,
-              username,
-              password: username,
-              profile: profile,
-              expiry: expDate,
-              sms: 'Sent ✓',
-            },
+            status: 'syncing',
+            message: 'Your payment was successful! Setting up your Wi-Fi access...',
           })
         }
       }

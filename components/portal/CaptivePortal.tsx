@@ -104,10 +104,12 @@ export function CaptivePortal({ initialPackages, mikrotikParams, returnReference
     return () => clearInterval(timer)
   }, [activeTab])
 
-  // Poll payment status from /api/payments/status
+  // Poll payment status from /api/payments/status.
+  // 10 min window: hosted checkout means switching to a real browser, picking a
+  // channel and entering a PIN — 3 min saw legitimate payers timed out.
   const startPolling = useCallback((reference: string, startTime: number) => {
     const checkStatus = async () => {
-      if (Date.now() - startTime > 180000) {
+      if (Date.now() - startTime > 600000) {
         setIsProcessing(false)
         setErrorMsg('Payment request timed out. If you were charged, please contact support.')
         return
@@ -214,13 +216,19 @@ export function CaptivePortal({ initialPackages, mikrotikParams, returnReference
       }
 
       if (data.checkoutUrl) {
+        // Deliberately NOT auto-redirecting. Inside a Captive Network Assistant
+        // (the mini-browser iOS/Android pops up on Wi-Fi join) an automatic
+        // location change is often blocked outright, and when it does work it
+        // tears down this page — killing the poll that grants access. Opening
+        // via an explicit tap in a new tab breaks out to the real browser and
+        // leaves this tab polling, so the student gets online either way.
         setCheckoutUrl(data.checkoutUrl)
-        setOvTitle('Redirecting to Hubtel…')
-        setOvMsg('Please wait, redirecting to secure payment page.')
-        window.location.href = data.checkoutUrl
+        setOvTitle('Ready to pay')
+        setOvMsg('Tap below to open the secure Hubtel payment page. Keep this screen open — your Wi-Fi unlocks here automatically once payment clears.')
+        startPolling(data.reference, Date.now())
         return
       }
-      
+
       // Fallback if no checkoutUrl but still successful (e.g., Direct Receive Money)
       setOvTitle('Waiting for MoMo approval…')
       setOvMsg(`Please follow the prompts on your phone to authorize payment.`)
@@ -605,12 +613,26 @@ export function CaptivePortal({ initialPackages, mikrotikParams, returnReference
             <h3 className="font-medium text-[20px] text-ink mb-1.5 tracking-tight">{ovTitle}</h3>
             <p className="font-mono text-[12px] text-muted leading-relaxed mb-4">{ovMsg}</p>
             {checkoutUrl && (
-              <a
-                href={checkoutUrl}
-                className="inline-flex items-center justify-center gap-1.5 w-full py-3 px-4 rounded-full bg-ink text-cream font-medium text-[15px] shadow-none hover:brightness-110 transition-all cursor-pointer mt-2"
-              >
-                <span>🔗 Complete Payment on Hubtel</span>
-              </a>
+              <>
+                <a
+                  href={checkoutUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-1.5 w-full py-3 px-4 rounded-full bg-ink text-cream font-medium text-[15px] shadow-none hover:brightness-110 transition-all cursor-pointer mt-2"
+                >
+                  <span>🔗 Pay Securely on Hubtel</span>
+                </a>
+                <p className="font-mono text-[11px] text-muted leading-relaxed mt-2.5">
+                  Payment page not opening? Copy this link into Safari or Chrome:
+                </p>
+                <button
+                  type="button"
+                  onClick={() => { navigator.clipboard.writeText(checkoutUrl) }}
+                  className="font-mono text-[11px] text-kumo-brand underline break-all mt-1 bg-transparent border-0 cursor-pointer p-0 text-left"
+                >
+                  {checkoutUrl}
+                </button>
+              </>
             )}
           </div>
         </div>

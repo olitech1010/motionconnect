@@ -11,6 +11,8 @@ export interface HubtelInitiateRequest {
 export interface HubtelInitiateResponse {
   reference: string
   checkoutUrl?: string
+  /** Hubtel's own id for the hosted checkout session. Stored for reconciliation. */
+  checkoutId?: string
   status: 'pending' | 'success' | 'failed'
   message?: string
 }

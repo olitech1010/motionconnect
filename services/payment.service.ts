@@ -1,4 +1,5 @@
 import { HubtelInitiateRequest, HubtelInitiateResponse } from '@/types/payment'
+import { webhookToken } from '@/lib/webhook-token'
 
 /**
  * Resolve the canonical base URL for callback/return URLs.
@@ -82,7 +83,9 @@ export class PaymentService {
 
     try {
       const baseUrl = getBaseUrl()
-      const callbackUrl = `${baseUrl}/api/payments/webhook`
+      // The token travels server-to-server only; it never reaches the browser,
+      // which is what makes it usable as webhook authentication.
+      const callbackUrl = `${baseUrl}/api/payments/webhook?token=${webhookToken(reference)}`
       const returnUrl = `${baseUrl}/?reference=${reference}`
 
       // Log the resolved URLs so we can verify in Vercel function logs
@@ -96,18 +99,41 @@ export class PaymentService {
       const myHeaders = new Headers()
       myHeaders.append("Authorization", `Basic ${auth}`)
       myHeaders.append("Content-Type", "application/json")
+      myHeaders.append("Cache-Control", "no-cache")
 
-      const channel = this.detectNetwork(request.phone)
+      // Two Hubtel products, two very different network requirements:
+      //
+      //   checkout (default) — payproxyapi.hubtel.com. Reachable from any IP.
+      //   direct             — rmp.hubtel.com. Pushes a USSD PIN prompt straight to
+      //                        the phone (better UX), but sits behind a WAF that
+      //                        403s every non-whitelisted source IP. Verified 403
+      //                        from our egress, so it stays opt-in until Hubtel
+      //                        whitelists a static IP for us.
+      const useDirect = process.env.HUBTEL_METHOD === 'direct'
 
-      const rawPayload = JSON.stringify({
-        CustomerName: request.name || 'Motion Connect User',
-        CustomerMsisdn: request.phone,
-        Channel: channel,
-        Amount: amount,
-        PrimaryCallbackUrl: callbackUrl,
-        Description: description,
-        ClientReference: reference,
-      })
+      const url = useDirect
+        ? `https://rmp.hubtel.com/merchantaccount/merchants/${merchantAccount}/receive/mobilemoney`
+        : 'https://payproxyapi.hubtel.com/items/initiate'
+
+      const rawPayload = useDirect
+        ? JSON.stringify({
+            CustomerName: request.name || 'Motion Connect User',
+            CustomerMsisdn: request.phone,
+            Channel: this.detectNetwork(request.phone),
+            Amount: amount,
+            PrimaryCallbackUrl: callbackUrl,
+            Description: description,
+            ClientReference: reference,
+          })
+        : JSON.stringify({
+            totalAmount: amount,
+            description,
+            callbackUrl,
+            returnUrl,
+            cancellationUrl: `${baseUrl}/?cancelled=${reference}`,
+            merchantAccountNumber: merchantAccount,
+            clientReference: reference,
+          })
 
       const requestOptions: RequestInit = {
         method: "POST",
@@ -117,11 +143,12 @@ export class PaymentService {
       }
 
       if (process.env.NODE_ENV !== 'production') {
+        console.log('Hubtel method:', useDirect ? 'direct (rmp)' : 'checkout (payproxyapi)')
         console.log('Payload:', rawPayload)
         console.log('Auth Header:', `Basic ${auth.substring(0, 8)}...`)
       }
 
-      const response = await fetch(`https://rmp.hubtel.com/merchantaccount/merchants/${merchantAccount}/receive/mobilemoney`, requestOptions)
+      const response = await fetch(url, requestOptions)
 
       // Convert response headers to a plain object for logging
       const responseHeaders: Record<string, string> = {}
@@ -140,17 +167,53 @@ export class PaymentService {
       }
 
       if (!response.ok) {
+        // Full body to the server log only. It can carry credential echoes and
+        // raw WAF HTML, so the caller gets a generic message instead.
         console.error('Hubtel Error Response:', response.status, rawText)
         return {
           reference,
           status: 'failed',
-          message: `Hubtel Error (${response.status}): ${rawText}`,
+          message: response.status === 403
+            ? 'Payment provider unavailable. Please try again shortly.'
+            : 'Could not reach the payment provider. Please try again.',
         }
+      }
+
+      if (useDirect) {
+        // Direct Receive answers the USSD push asynchronously; nothing to hand back.
+        return { reference, status: 'pending' }
+      }
+
+      interface HubtelCheckoutResponse {
+        responseCode?: string
+        status?: string
+        data?: {
+          checkoutUrl?: string
+          checkoutDirectUrl?: string
+          checkoutId?: string
+        }
+      }
+
+      let parsed: HubtelCheckoutResponse
+      try {
+        parsed = JSON.parse(rawText) as HubtelCheckoutResponse
+      } catch {
+        console.error('Hubtel checkout returned non-JSON body:', rawText.slice(0, 500))
+        return { reference, status: 'failed', message: 'Unexpected response from payment provider.' }
+      }
+
+      const checkoutUrl = parsed.data?.checkoutUrl || parsed.data?.checkoutDirectUrl
+
+      if (parsed.responseCode !== '0000' || !checkoutUrl) {
+        console.error('Hubtel checkout rejected:', rawText.slice(0, 500))
+        return { reference, status: 'failed', message: 'Could not start checkout. Please try again.' }
       }
 
       return {
         reference,
         status: 'pending',
+        checkoutUrl,
+        checkoutId: parsed.data?.checkoutId,
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Unknown Hubtel error'

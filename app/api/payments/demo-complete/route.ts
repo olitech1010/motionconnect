@@ -3,6 +3,14 @@ import { TransactionService } from '@/services/transaction.service'
 import { PackageService } from '@/services/package.service'
 
 export async function POST(request: Request) {
+  // Demo-mode only: this endpoint flips any pending transaction to success with
+  // no authentication. Left open in live mode it lets anyone mark unpaid
+  // transactions as paid, so it hard-fails unless mock mode is on.
+  const isMock = process.env.HUBTEL_MOCK === 'true' || process.env.HUBTEL_CLIENT_ID === 'demo_client_id'
+  if (!isMock) {
+    return NextResponse.json({ success: false, message: 'Not available' }, { status: 404 })
+  }
+
   try {
     const { reference } = await request.json()
 
