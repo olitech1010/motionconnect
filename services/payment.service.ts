@@ -144,7 +144,7 @@ export class PaymentService {
         return {
           reference,
           status: 'failed',
-          message: 'Payment provider rejected the request',
+          message: `Hubtel Error (${response.status}): ${rawText}`,
         }
       }
 
