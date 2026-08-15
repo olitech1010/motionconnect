@@ -1,3 +1,4 @@
+
 # motionconnect-router.rsc — CANONICAL router-side setup (RouterOS v7.13+)
 # ============================================================================
 # This is the ONLY script that matches the deployed API. The two older files
@@ -52,26 +53,30 @@ add dst-host=wa.me action=allow comment="mcsync: support link"
 # MAC-based login means the student gets online with zero typing; the voucher
 # shown on the portal is a fallback for device changes.
 # ---------------------------------------------------------------------------
+# NOTE: no early exits — a bare :return is invalid at script level in RouterOS
+# and made every idle run error out. Empty-queue runs must fall through quietly.
 /system script add name=mcsync-poll policy=read,write,test,policy source={
     :local base "https://motionconnect.vercel.app";
     :local key  "<SHARED_SECRET>";
 
     :local resp;
+    :local ok true;
     :do {
         :set resp [/tool fetch url="$base/api/router/sync" mode=https \
             http-method=get \
             http-header-field="x-router-key: $key" \
             output=user as-value];
-    } on-error={ :log warning "mcsync: fetch failed"; :return; }
+    } on-error={ :log warning "mcsync: fetch failed"; :set ok false; }
 
-    :if (($resp->"status") != "finished") do={ :return; }
+    :if ($ok) do={
+    :if (($resp->"status") = "finished") do={
 
     :local list;
     :do {
         :set list [:deserialize ($resp->"data") from=json];
-    } on-error={ :log warning "mcsync: bad JSON from sync endpoint"; :return; }
+    } on-error={ :log warning "mcsync: bad JSON from sync endpoint"; :set list [:toarray ""]; }
 
-    :if ([:len $list] = 0) do={ :return; }
+    :if ([:len $list] > 0) do={
 
     :local done "";
 
@@ -80,7 +85,9 @@ add dst-host=wa.me action=allow comment="mcsync: support link"
         :local user  ($item->"username");
         :local pass  ($item->"password");
         :local prof  ($item->"profile");
-        :local mac   [:toupper ($item->"mac")];
+        # API contract: sync returns the MAC already uppercased
+        # (:toupper does not exist in RouterOS 7.23)
+        :local mac   ($item->"mac");
         :local utime ($item->"uptime");
 
         # 1. Create or refresh the hotspot user (idempotent; password==username
@@ -127,6 +134,10 @@ add dst-host=wa.me action=allow comment="mcsync: support link"
             http-header-field="x-router-key: $key,Content-Type: application/json" \
             http-data=("{\"ids\":[" . $done . "]}") output=none;
     } on-error={ :log warning "mcsync: confirm failed, will re-sync next cycle"; }
+
+    }
+    }
+    }
 }
 
 /system scheduler add name=mcsync-sched interval=15s \
