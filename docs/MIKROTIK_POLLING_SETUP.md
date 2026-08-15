@@ -1,3 +1,7 @@
+> [!WARNING]
+> **DEPRECATED (2026-08-15).** The CSV-parsing script below never matched the JSON API and contains a revoked key. Use `docs/hotspot/motionconnect-router.rsc`.
+> See [`docs/MAINTENANCE.md`](MAINTENANCE.md) for the current, authoritative documentation.
+
 # MikroTik Router Polling Setup Guide
 
 This guide configures your MikroTik RB5009 to automatically poll the MotionConnect cloud server for paid users and create hotspot accounts locally.

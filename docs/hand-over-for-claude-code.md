@@ -1,3 +1,7 @@
+> [!WARNING]
+> **DEPRECATED (2026-08-15).** Historical: describes the pre-fix payment dilemma. It was resolved on 2026-08-14/15 — Hosted Checkout is live end-to-end.
+> See [`docs/MAINTENANCE.md`](MAINTENANCE.md) for the current, authoritative documentation.
+
 # MotionConnect — AI Handover & Context Document
 
 **Target AI:** Claude Code (or any new AI agent taking over the project)

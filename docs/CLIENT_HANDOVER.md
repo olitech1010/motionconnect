@@ -1,3 +1,7 @@
+> [!WARNING]
+> **DEPRECATED (2026-08-15).** The router script below is obsolete (bare :return errors) and contains a revoked API key. The only valid router script is `docs/hotspot/motionconnect-router.rsc`.
+> See [`docs/MAINTENANCE.md`](MAINTENANCE.md) for the current, authoritative documentation.
+
 # MotionConnect — Client & Infrastructure Handover
 
 This document outlines the current architecture, recent fixes, and final deployment state of the MotionConnect captive portal billing system. It is designed to be handed over to the client and any assisting AI agents to understand the system's mechanics.

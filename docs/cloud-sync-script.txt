@@ -1,3 +1,7 @@
+# =============================================================================
+# DEPRECATED (2026-08-15): this script parses CSV but the API returns JSON, and
+# this API key has been REVOKED. Use docs/hotspot/motionconnect-router.rsc.
+# =============================================================================
 :local apiKey "Tq22rgVP9ljKMjGd4mIIVqLkz24l30FQq7mB"
 :local syncUrl "https://motionconnect.vercel.app/api/router/sync"
 :local confirmUrl "https://motionconnect.vercel.app/api/router/confirm"

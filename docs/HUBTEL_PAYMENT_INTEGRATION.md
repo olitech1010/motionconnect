@@ -1,3 +1,7 @@
+> [!WARNING]
+> **DEPRECATED (2026-08-15).** Outdated: says Direct Receive (rmp.hubtel.com) is implemented. Production uses Hosted Checkout; Direct is behind HUBTEL_METHOD=direct pending IP whitelisting.
+> See [`docs/MAINTENANCE.md`](MAINTENANCE.md) for the current, authoritative documentation.
+
 # MotionConnect — Hubtel Payment Integration Technical Specification & Documentation
 
 **Prepared for:** MotionConnect & Hubtel Engineering Review Meeting  

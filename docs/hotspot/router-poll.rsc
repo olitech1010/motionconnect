@@ -1,3 +1,7 @@
+# =============================================================================
+# DEPRECATED (2026-08-15): calls /api/pending-authorizations and
+# /api/mark-activated, which do not exist. Use motionconnect-router.rsc instead.
+# =============================================================================
 # router-poll.rsc
 # ============================================================================
 # RECOMMENDED APPROACH for a Starlink site (dynamic IP, no inbound access).
