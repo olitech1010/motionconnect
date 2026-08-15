@@ -46,7 +46,6 @@ export function CaptivePortal({ initialPackages, mikrotikParams, returnReference
     password: string
     profile: string
     expiry: string
-    sms: string
   } | null>(null)
   const [copied, setCopied] = useState(false)
   const [countdown, setCountdown] = useState(0)
@@ -548,10 +547,6 @@ export function CaptivePortal({ initialPackages, mikrotikParams, returnReference
                 <span className="font-mono text-[12px] text-muted">Expiry Date</span>
                 <span className="font-medium text-ink">{creds.expiry}</span>
               </div>
-              <div className="py-2 flex justify-between items-center text-sm">
-                <span className="font-mono text-[12px] text-muted">SMS Notification</span>
-                <span className="font-medium text-ai">{creds.sms}</span>
-              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-2 mt-4">
@@ -631,6 +626,13 @@ export function CaptivePortal({ initialPackages, mikrotikParams, returnReference
                   className="font-mono text-[11px] text-kumo-brand underline break-all mt-1 bg-transparent border-0 cursor-pointer p-0 text-left"
                 >
                   {checkoutUrl}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setIsProcessing(false); setCheckoutUrl(null) }}
+                  className="font-mono text-[12px] text-muted underline bg-transparent border-0 cursor-pointer p-0 mt-3"
+                >
+                  Cancel — choose a different package
                 </button>
               </>
             )}

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import crypto from 'crypto'
 import { z } from 'zod'
 import { PackageService } from '@/services/package.service'
 import { TransactionService } from '@/services/transaction.service'
@@ -40,8 +41,10 @@ export async function POST(request: Request) {
       )
     }
 
-    // Generate unique reference
-    const reference = `MC-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`
+    // Generate unique reference. Crypto-random suffix: /api/payments/status
+    // returns voucher credentials for this reference, so it must not be
+    // guessable/enumerable.
+    const reference = `MC-${Date.now().toString(36).toUpperCase()}-${crypto.randomBytes(4).toString('hex').toUpperCase()}`
 
     // Create transaction in database (status: pending)
     await TransactionService.createTransaction({

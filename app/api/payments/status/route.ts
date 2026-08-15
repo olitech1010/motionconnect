@@ -49,7 +49,6 @@ export async function GET(request: Request) {
           password: transaction.mikrotik_username || '—',
           profile: profile,
           expiry: expDate,
-          sms: transaction.sms_status === 'sent' ? 'Sent ✓' : 'Sent ✓ (demo)',
         },
       })
     }
@@ -95,7 +94,6 @@ export async function GET(request: Request) {
             password: updated.mikrotik_username || username,
             profile: profile,
             expiry: expDate,
-            sms: 'Sent ✓ (demo)',
           },
         })
       }
